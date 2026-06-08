@@ -3,40 +3,37 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Services\ActivityService;
 use App\Repositories\Contracts\ActivityRepositoryInterface;
 use Inertia\Inertia;
-use Carbon\Carbon;
 
 class ActivityController extends Controller
 {
+    protected $activityService;
     protected $activityRepository;
 
-    // Melakukan inject interface ke dalam controller
-    public function __construct(ActivityRepositoryInterface $activityRepository)
+    public function __construct(ActivityService $activityService, ActivityRepositoryInterface $activityRepository)
     {
+        $this->activityService = $activityService;
         $this->activityRepository = $activityRepository;
     }
 
-    // Menampilkan halaman dashboard beserta datanya
     public function index()
     {
         $user = auth()->user();
-
-        // Logika Role-Based Access Control (RBAC)
+        
         if ($user->role === 'atasan') {
             $activities = $this->activityRepository->getAllActivities();
         } else {
             $activities = $this->activityRepository->getUserActivities($user->id);
         }
 
-        // Mengirim data ke Frontend React (Inertia)
         return Inertia::render('Activities/Index', [
             'activities' => $activities,
             'userRole' => $user->role
         ]);
     }
 
-    // Fungsi untuk menyimpan aktivitas harian
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -49,23 +46,8 @@ class ActivityController extends Controller
             'ibadah' => 'nullable|string'
         ]);
 
-        // Menghitung durasi otomatis menggunakan library Carbon bawaan Laravel
-        $mulai = Carbon::parse($validated['waktu_mulai']);
-        $akhir = Carbon::parse($validated['waktu_akhir']);
-
-        // Jika waktu akhir lewat tengah malam
-        if ($akhir->lessThan($mulai)) {
-            $akhir->addDay(); 
-        }
-
-        $durasi = $mulai->diffInMinutes($akhir);
-
-        // Menambahkan user_id dan durasi ke dalam data yang akan disimpan
-        $validated['user_id'] = auth()->id();
-        $validated['durasi_menit'] = $durasi;
-
-        // Menyimpan data melalui Repository
-        $this->activityRepository->createActivity($validated);
+        // Panggil Service untuk mengurus perhitungan dan penyimpanan
+        $this->activityService->storeActivity($validated, auth()->id());
 
         return redirect()->back()->with('success', 'Aktivitas berhasil dicatat.');
     }

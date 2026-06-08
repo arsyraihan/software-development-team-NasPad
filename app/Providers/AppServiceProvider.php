@@ -4,10 +4,10 @@ namespace App\Providers;
 
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
-
-// Tambahkan dua baris ini untuk mengimpor Interface dan Repository
 use App\Repositories\Contracts\ActivityRepositoryInterface;
 use App\Repositories\ActivityRepository;
+use App\Repositories\Contracts\UserRepositoryInterface;
+use App\Repositories\UserRepository;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -16,11 +16,21 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        // Kurung tutup dan titik koma sudah ditambahkan di sini
+        // Binding Activity
         $this->app->bind(
             ActivityRepositoryInterface::class, 
             ActivityRepository::class
         );
+
+        // Binding User
+        $this->app->bind(
+            UserRepositoryInterface::class, 
+            UserRepository::class
+        );
+
+        $this->app->singleton(ActivityService::class, function ($app) {
+            return new ActivityService($app->make(ActivityRepositoryInterface::class));
+        });
     }
 
     /**
