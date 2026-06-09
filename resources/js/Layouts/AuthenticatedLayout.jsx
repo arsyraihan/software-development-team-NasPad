@@ -37,6 +37,12 @@ export default function AuthenticatedLayout({ header, children }) {
                                 >
                                     Activities
                                 </NavLink>
+                                <NavLink
+                                    href={route('calendar.index')}
+                                    active={route().current('calendar.*')}
+                                >
+                                    Kalender
+                                </NavLink>
                                 {user.role === 'atasan' && (
                                     <NavLink
                                         href={route('users.index')}
@@ -155,6 +161,12 @@ export default function AuthenticatedLayout({ header, children }) {
                             active={route().current('activities.*')}
                         >
                             Activities
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            href={route('calendar.index')}
+                            active={route().current('calendar.*')}
+                        >
+                            Kalender
                         </ResponsiveNavLink>
                         {user.role === 'atasan' && (
                             <ResponsiveNavLink
