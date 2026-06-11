@@ -3,53 +3,88 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Repositories\Contracts\ActivityRepositoryInterface;
-use Inertia\Inertia;
 use App\Models\User;
 use App\Models\Activity;
+use App\Models\Note;
+use Inertia\Inertia;
+use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
-    protected $activityRepository;
-
-    public function __construct(ActivityRepositoryInterface $activityRepository)
-    {
-        $this->activityRepository = $activityRepository;
-    }
-
     public function index()
     {
         $user = auth()->user();
-        
-        // Ambil data untuk statistik
-        $query = Activity::query();
-        if ($user->role !== 'atasan') {
+        $isAtasan = $user->role === 'atasan';
+
+        // 1. Total User
+        $totalUsers = User::where('role', 'karyawan')->count();
+
+        // Data aktivitas bulan ini
+        $query = Activity::with('user')->whereMonth('tanggal', Carbon::now()->month);
+        if (!$isAtasan) {
             $query->where('user_id', $user->id);
         }
+        $activities = $query->get();
 
-        $totalAktivitas = (clone $query)->count();
-        $totalDurasiJam = round((clone $query)->sum('durasi_menit') / 60, 2);
+        // 2. Jadwal / Catatan Khusus Hari Ini
+        $notesHariIni = Note::with('user')->whereDate('tanggal', Carbon::today())->get();
 
-        // Menghitung persentase kategori pekerjaan (BSC, Daily, Improvement)
-        $kategoriStats = (clone $query)
-            ->selectRaw('kategori, count(*) as jumlah')
-            ->groupBy('kategori')
-            ->get()
-            ->pluck('jumlah', 'kategori');
+        // 3. Widget Aktivitas per User (Scrollable)
+        $userActivityCounts = [];
+        if ($isAtasan) {
+            foreach ($activities->groupBy('user_id') as $acts) {
+                $userActivityCounts[] = [
+                    'name' => $acts->first()->user->name,
+                    'total' => $acts->count()
+                ];
+            }
+            // Urutkan dari aktivitas terbanyak
+            usort($userActivityCounts, fn($a, $b) => $b['total'] <=> $a['total']);
+        }
+
+        // 4. Data untuk ApexCharts (Area, Polar, Bar)
+        
+        // Chart 1: Area (Trend Durasi Harian)
+        $areaLabels = [];
+        $areaData = [];
+        foreach ($activities->groupBy('tanggal')->sortBy(fn($val, $key) => $key) as $tgl => $acts) {
+            $areaLabels[] = Carbon::parse($tgl)->format('d M');
+            $areaData[] = round($acts->sum('durasi_menit') / 60, 2);
+        }
+
+        // Chart 2: Polar Area (Distribusi Kategori)
+        $polarLabels = ['BSC / OKR', 'Daily Task', 'Improvement Goal'];
+        $polarData = [
+            $activities->where('kategori', 'BSC / OKR')->count(),
+            $activities->where('kategori', 'Daily Task')->count(),
+            $activities->where('kategori', 'Improvement Goal')->count(),
+        ];
+
+        // Chart 3: Bar (Selisih & Perbandingan Durasi)
+        $barLabels = [];
+        $barData = [];
+        if ($isAtasan) {
+            foreach ($activities->groupBy('user_id') as $acts) {
+                $barLabels[] = explode(' ', $acts->first()->user->name)[0]; // Ambil nama depan saja
+                $barData[] = round($acts->sum('durasi_menit') / 60, 2);
+            }
+        } else {
+             foreach ($activities->groupBy('kategori') as $kat => $acts) {
+                 $barLabels[] = $kat;
+                 $barData[] = round($acts->sum('durasi_menit') / 60, 2);
+             }
+        }
 
         return Inertia::render('Dashboard', [
             'userRole' => $user->role,
-            'stats' => [
-                'totalAktivitas' => $totalAktivitas,
-                'totalDurasiJam' => $totalDurasiJam,
-                'kategori' => [
-                    'BSC_OKR' => $kategoriStats['BSC / OKR'] ?? 0,
-                    'Daily_Task' => $kategoriStats['Daily Task'] ?? 0,
-                    'Improvement_Goal' => $kategoriStats['Improvement Goal'] ?? 0,
-                ]
-            ],
-            // Jika atasan, kita kirim daftar seluruh anggota tim
-            'teamMembers' => $user->role === 'atasan' ? User::where('role', 'karyawan')->get() : []
+            'totalUsers' => $totalUsers,
+            'notesHariIni' => $notesHariIni,
+            'userActivityCounts' => $userActivityCounts,
+            'chartData' => [
+                'area' => ['labels' => $areaLabels, 'data' => $areaData],
+                'polar' => ['labels' => $polarLabels, 'data' => $polarData],
+                'bar' => ['labels' => $barLabels, 'data' => $barData],
+            ]
         ]);
     }
 }
