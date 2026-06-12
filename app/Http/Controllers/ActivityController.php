@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Services\ActivityService;
 use App\Repositories\Contracts\ActivityRepositoryInterface;
+use App\Models\AppNotification; // Tambahan untuk memanggil model notifikasi
 use Inertia\Inertia;
 
 class ActivityController extends Controller
@@ -48,6 +49,14 @@ class ActivityController extends Controller
 
         // Panggil Service untuk mengurus perhitungan dan penyimpanan
         $this->activityService->storeActivity($validated, auth()->id());
+
+        // --- SISTEM PENCATATAN NOTIFIKASI ---
+        AppNotification::create([
+            'user_id' => auth()->id(),
+            'pesan' => 'Berhasil mengirim data Tracker/Laporan baru.',
+            'tipe' => 'success'
+        ]);
+        // ------------------------------------
 
         return redirect()->back()->with('success', 'Aktivitas berhasil dicatat.');
     }

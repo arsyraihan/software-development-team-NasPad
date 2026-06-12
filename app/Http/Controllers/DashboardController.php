@@ -15,44 +15,42 @@ class DashboardController extends Controller
     {
         $user = auth()->user();
         $isAtasan = $user->role === 'atasan';
+        $divisi = $user->divisi; 
 
-        // 1. Total User
-        $totalUsers = User::where('role', 'karyawan')->count();
+        $totalUsers = User::where('role', 'karyawan')->where('divisi', $divisi)->count();
 
-        // Data aktivitas bulan ini
-        $query = Activity::with('user')->whereMonth('tanggal', Carbon::now()->month);
+        $query = Activity::with('user')->whereHas('user', function($q) use ($divisi) {
+            if ($divisi) $q->where('divisi', $divisi);
+        })->whereMonth('tanggal', Carbon::now()->month);
+
+        $activitiesForChart = (clone $query);
         if (!$isAtasan) {
-            $query->where('user_id', $user->id);
+            $activitiesForChart->where('user_id', $user->id);
         }
-        $activities = $query->get();
+        $activities = $activitiesForChart->get();
 
-        // 2. Jadwal / Catatan Khusus Hari Ini
-        $notesHariIni = Note::with('user')->whereDate('tanggal', Carbon::today())->get();
+        // LOG TERBARU (Tidak dibatasi hari ini, ambil 15 terakhir)
+        $logTerbaru = Activity::with('user')
+            ->whereHas('user', function($q) use ($divisi) {
+                if ($divisi) $q->where('divisi', $divisi);
+            })
+            ->orderBy('created_at', 'desc')
+            ->take(15)
+            ->get();
 
-        // 3. Widget Aktivitas per User (Scrollable)
-        $userActivityCounts = [];
-        if ($isAtasan) {
-            foreach ($activities->groupBy('user_id') as $acts) {
-                $userActivityCounts[] = [
-                    'name' => $acts->first()->user->name,
-                    'total' => $acts->count()
-                ];
-            }
-            // Urutkan dari aktivitas terbanyak
-            usort($userActivityCounts, fn($a, $b) => $b['total'] <=> $a['total']);
-        }
+        $notesHariIni = Note::with('user')->whereHas('user', function($q) use ($divisi) {
+            if ($divisi) $q->where('divisi', $divisi);
+        })->whereDate('tanggal', Carbon::today())->get();
 
-        // 4. Data untuk ApexCharts (Area, Polar, Bar)
-        
-        // Chart 1: Area (Trend Durasi Harian)
+        // Chart 1: Trend Durasi Harian (Area Chart)
         $areaLabels = [];
         $areaData = [];
-        foreach ($activities->groupBy('tanggal')->sortBy(fn($val, $key) => $key) as $tgl => $acts) {
+        foreach ($activities->groupBy('tanggal')->sortBy(fn($v, $k) => $k) as $tgl => $acts) {
             $areaLabels[] = Carbon::parse($tgl)->format('d M');
-            $areaData[] = round($acts->sum('durasi_menit') / 60, 2);
+            $areaData[] = round($acts->whereNotIn('kategori', ['Sakit', 'Izin'])->sum('durasi_menit') / 60, 2);
         }
 
-        // Chart 2: Polar Area (Distribusi Kategori)
+        // Chart 2: Polar Area Kategori
         $polarLabels = ['BSC / OKR', 'Daily Task', 'Improvement Goal'];
         $polarData = [
             $activities->where('kategori', 'BSC / OKR')->count(),
@@ -60,30 +58,47 @@ class DashboardController extends Controller
             $activities->where('kategori', 'Improvement Goal')->count(),
         ];
 
-        // Chart 3: Bar (Selisih & Perbandingan Durasi)
-        $barLabels = [];
-        $barData = [];
+        // Chart 3: Perbandingan Jam Tim (Line Straight)
+        $dates = $activities->pluck('tanggal')->unique()->sort()->values();
+        $comparisonLabels = [];
+        foreach($dates as $d) {
+            $comparisonLabels[] = Carbon::parse($d)->format('d M');
+        }
+        $comparisonSeries = [];
+
         if ($isAtasan) {
-            foreach ($activities->groupBy('user_id') as $acts) {
-                $barLabels[] = explode(' ', $acts->first()->user->name)[0]; // Ambil nama depan saja
-                $barData[] = round($acts->sum('durasi_menit') / 60, 2);
+            foreach ($activities->groupBy('user_id') as $userId => $acts) {
+                $userData = [];
+                foreach ($dates as $date) {
+                    $sum = $acts->where('tanggal', $date)->whereNotIn('kategori', ['Sakit', 'Izin'])->sum('durasi_menit');
+                    $userData[] = round($sum / 60, 2);
+                }
+                $comparisonSeries[] = [
+                    'name' => explode(' ', $acts->first()->user->name)[0],
+                    'data' => $userData
+                ];
             }
         } else {
-             foreach ($activities->groupBy('kategori') as $kat => $acts) {
-                 $barLabels[] = $kat;
-                 $barData[] = round($acts->sum('durasi_menit') / 60, 2);
-             }
+            foreach (['Daily Task', 'BSC / OKR', 'Improvement Goal'] as $kat) {
+                $katData = [];
+                foreach ($dates as $date) {
+                    $sum = $activities->where('tanggal', $date)->where('kategori', $kat)->sum('durasi_menit');
+                    $katData[] = round($sum / 60, 2);
+                }
+                $comparisonSeries[] = ['name' => $kat, 'data' => $katData];
+            }
         }
 
         return Inertia::render('Dashboard', [
             'userRole' => $user->role,
+            'userDivisi' => $divisi,
             'totalUsers' => $totalUsers,
+            'logTerbaru' => $logTerbaru, // Diubah namanya
             'notesHariIni' => $notesHariIni,
-            'userActivityCounts' => $userActivityCounts,
             'chartData' => [
                 'area' => ['labels' => $areaLabels, 'data' => $areaData],
                 'polar' => ['labels' => $polarLabels, 'data' => $polarData],
-                'bar' => ['labels' => $barLabels, 'data' => $barData],
+                'comparison' => ['labels' => $comparisonLabels, 'series' => $comparisonSeries],
             ]
         ]);
     }
