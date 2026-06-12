@@ -21,6 +21,7 @@ Jalankan Server
 - `npm run dev`
 
 Dibuat bersama:
-`wyzeiX`  [Project Manager]
-`rzwig4`  [Frontend] --Status: AFK
-`Ghea2003`[Backend]
+
+- `wyzeiX` [Project Manager]
+- `rzwig4` [Frontend] --Status: AFK
+- `Ghea2003`[Backend]
