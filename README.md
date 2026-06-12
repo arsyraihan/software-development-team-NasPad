@@ -5,18 +5,6 @@ Install Dependencies
 - `composer install`
 - `npm install` or `npm install --legacy-peer-deps` (lakukan jika npm error karena perbedaan versi)
 - `npm run build`
-- `npm install` or `npm install --legacy-peer-deps` (lakukan jika npm error karena perbedaan versi)
-
-Konfigurasi Database ke Supabase
-
-- `Copy file .env.example dan ubah salah satu filenya menjadi .env`
-- `Sesuaikan konfigurasi database sama supabase:`
-  `CONTOH`
-  `host:db.abcdefghij.supabase.co`
-  `port:3000`
-  `database:postgres`
-  `user:postgres`
-  `password:password_kamu`
 
 generate key
 
