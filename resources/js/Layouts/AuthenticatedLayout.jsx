@@ -2,9 +2,9 @@ import ApplicationLogo from '@/Components/ApplicationLogo';
 import Dropdown from '@/Components/Dropdown';
 import NavLink from '@/Components/NavLink';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
-import { Link, usePage } from '@inertiajs/react';
+import { Link, usePage, router } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
-import { Clock, Bell, LayoutDashboard, Activity, CalendarDays, Users, User, LogOut } from 'lucide-react';
+import { Clock, Bell, LayoutDashboard, Activity, CalendarDays, Users, User, LogOut, Check, Trash2 } from 'lucide-react';
 
 export default function AuthenticatedLayout({ header, children }) {
     const authUser = usePage().props.auth.user;
@@ -20,7 +20,7 @@ export default function AuthenticatedLayout({ header, children }) {
         return () => clearInterval(timer);
     }, []);
 
-    // Toast Notifikasi
+    // Toast Notifikasi (Popup Hijau saat Berhasil)
     useEffect(() => {
         if (flash?.success) {
             setShowToast(true);
@@ -47,6 +47,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                 <ApplicationLogo className="block h-9 w-auto text-red-600" />
                             </Link>
                             
+                            {/* Navigasi Layar Desktop */}
                             <div className="hidden space-x-6 sm:-my-px sm:ms-10 sm:flex">
                                 <NavLink href={route('dashboard')} active={route().current('dashboard')}>
                                     <LayoutDashboard className="w-4 h-4 mr-2" /> Dashboard
@@ -72,12 +73,13 @@ export default function AuthenticatedLayout({ header, children }) {
                                 {currentTime.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }).replace(':', '.')}
                             </div>
                             
-                            {/* NOTIFICATION BELL */}
+                            {/* NOTIFICATION BELL WIDGET */}
                             <Dropdown>
                                 <Dropdown.Trigger>
                                     <button className="relative p-2 text-gray-500 hover:text-red-600 transition-all duration-300 transform hover:-translate-y-1 hover:bg-red-50 rounded-full focus:outline-none">
                                         <Bell className="w-6 h-6" />
-                                        {notifications?.length > 0 && (
+                                        {/* Titik merah hanya muncul jika ada notifikasi yang BELUM dibaca */}
+                                        {notifications?.filter(n => !n.is_read).length > 0 && (
                                             <span className="absolute top-1 right-1 flex h-3 w-3">
                                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
                                                 <span className="relative inline-flex rounded-full h-3 w-3 bg-red-600"></span>
@@ -85,20 +87,62 @@ export default function AuthenticatedLayout({ header, children }) {
                                         )}
                                     </button>
                                 </Dropdown.Trigger>
-                                <Dropdown.Content>
-                                    <div className="block px-4 py-2 text-xs font-bold uppercase bg-gradient-to-r from-red-600 to-orange-500 text-white rounded-t-md">
-                                        Notifikasi Terbaru
+                                <Dropdown.Content width="w-80">
+                                    <div className="block px-4 py-3 text-xs font-bold uppercase bg-gray-50 border-b border-gray-100 text-gray-700 flex justify-between items-center rounded-t-md">
+                                        <span>Notifikasi</span>
+                                        {notifications?.length > 0 && (
+                                            <button 
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    router.delete(route('notifications.destroyAll'), { preserveScroll: true, preserveState: true });
+                                                }} 
+                                                className="text-gray-400 hover:text-red-500 transition lowercase font-medium"
+                                            >
+                                                hapus semua
+                                            </button>
+                                        )}
                                     </div>
-                                    <div className="max-h-60 overflow-y-auto">
+                                    <div className="max-h-64 overflow-y-auto custom-scrollbar bg-white">
                                         {notifications?.length > 0 ? (
                                             notifications.map((notif) => (
-                                                <div key={notif.id} className="block px-4 py-3 text-sm border-b hover:bg-orange-50 transition">
-                                                    <span className="font-bold text-red-600 block">{notif.pesan}</span>
-                                                    <span className="text-[10px] text-gray-400">{new Date(notif.created_at).toLocaleString('id-ID')}</span>
+                                                <div key={notif.id} className={`block px-4 py-3 text-sm border-b border-gray-50 transition relative group ${notif.is_read ? 'opacity-60' : 'bg-white border-l-4 border-l-orange-500'}`}>
+                                                    <div className="pr-12"> 
+                                                        <span className={`block font-medium ${notif.is_read ? 'text-gray-500' : 'text-gray-800'}`}>{notif.pesan}</span>
+                                                        <span className="text-[10px] text-gray-400 mt-1 block">{new Date(notif.created_at).toLocaleString('id-ID')}</span>
+                                                    </div>
+                                                    
+                                                    {/* Tombol Aksi Minimalis (Tanpa Background) */}
+                                                    <div className="absolute right-3 top-4 flex space-x-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                                        {!notif.is_read && (
+                                                            <button 
+                                                                onClick={(e) => {
+                                                                    e.preventDefault();
+                                                                    router.patch(route('notifications.read', notif.id), {}, { preserveScroll: true, preserveState: true });
+                                                                }} 
+                                                                className="text-gray-300 hover:text-emerald-500 transition-colors" 
+                                                                title="Tandai Dibaca"
+                                                            >
+                                                                <Check className="w-4 h-4"/>
+                                                            </button>
+                                                        )}
+                                                        <button 
+                                                            onClick={(e) => {
+                                                                e.preventDefault();
+                                                                router.delete(route('notifications.destroy', notif.id), { preserveScroll: true, preserveState: true });
+                                                            }} 
+                                                            className="text-gray-300 hover:text-red-500 transition-colors" 
+                                                            title="Hapus"
+                                                        >
+                                                            <Trash2 className="w-4 h-4"/>
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             ))
                                         ) : (
-                                            <div className="block px-4 py-4 text-sm text-gray-500 text-center">Bersih.</div>
+                                            <div className="block px-4 py-8 text-sm text-gray-400 text-center flex flex-col items-center">
+                                                <Bell className="w-8 h-8 opacity-20 mb-2" />
+                                                Bersih, tidak ada notifikasi.
+                                            </div>
                                         )}
                                     </div>
                                 </Dropdown.Content>
@@ -107,16 +151,51 @@ export default function AuthenticatedLayout({ header, children }) {
                             {/* USER PROFILE */}
                             <Dropdown>
                                 <Dropdown.Trigger>
-                                    <button type="button" className="inline-flex items-center rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 hover:border-red-300 hover:text-red-600 hover:shadow-md transition-all duration-300 transform hover:-translate-y-1">
+                                    <button type="button" className="inline-flex items-center rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 hover:border-red-300 hover:text-red-600 hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 focus:outline-none">
                                         <User className="w-4 h-4 mr-2 text-orange-500" />
                                         {authUser.name}
                                     </button>
                                 </Dropdown.Trigger>
                                 <Dropdown.Content>
-                                    <Dropdown.Link href={route('profile.edit')}><User className="w-4 h-4 inline mr-2"/> Profile</Dropdown.Link>
+                                    <Dropdown.Link href={route('profile.edit')}><User className="w-4 h-4 inline mr-2 text-gray-500"/> Profile</Dropdown.Link>
                                     <Dropdown.Link href={route('logout')} method="post" as="button"><LogOut className="w-4 h-4 inline mr-2 text-red-500"/> Log Out</Dropdown.Link>
                                 </Dropdown.Content>
                             </Dropdown>
+                        </div>
+
+                        {/* Hamburger Menu Layar HP */}
+                        <div className="-me-2 flex items-center sm:hidden">
+                            <button
+                                onClick={() => setShowingNavigationDropdown((previousState) => !previousState)}
+                                className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 transition duration-150 ease-in-out hover:bg-gray-100 hover:text-gray-500 focus:bg-gray-100 focus:text-gray-500 focus:outline-none"
+                            >
+                                <svg className="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+                                    <path className={!showingNavigationDropdown ? 'inline-flex' : 'hidden'} strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+                                    <path className={showingNavigationDropdown ? 'inline-flex' : 'hidden'} strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Navigasi Layar Mobile (Dropdown saat layar kecil) */}
+                <div className={(showingNavigationDropdown ? 'block' : 'hidden') + ' sm:hidden'}>
+                    <div className="space-y-1 pb-3 pt-2">
+                        <ResponsiveNavLink href={route('dashboard')} active={route().current('dashboard')}>Dashboard</ResponsiveNavLink>
+                        <ResponsiveNavLink href={route('activities.index')} active={route().current('activities.*')}>Activities</ResponsiveNavLink>
+                        <ResponsiveNavLink href={route('calendar.index')} active={route().current('calendar.*')}>Kalender</ResponsiveNavLink>
+                        {authUser.role === 'atasan' && (
+                            <ResponsiveNavLink href={route('users.index')} active={route().current('users.*')}>User Management</ResponsiveNavLink>
+                        )}
+                    </div>
+                    <div className="border-t border-gray-200 pb-1 pt-4">
+                        <div className="px-4">
+                            <div className="text-base font-medium text-gray-800">{authUser.name}</div>
+                            <div className="text-sm font-medium text-gray-500">{authUser.email}</div>
+                        </div>
+                        <div className="mt-3 space-y-1">
+                            <ResponsiveNavLink href={route('profile.edit')}>Profile</ResponsiveNavLink>
+                            <ResponsiveNavLink method="post" href={route('logout')} as="button">Log Out</ResponsiveNavLink>
                         </div>
                     </div>
                 </div>
@@ -131,6 +210,14 @@ export default function AuthenticatedLayout({ header, children }) {
             )}
 
             <main className="relative z-0 pb-12">{children}</main>
+
+            {/* Custom Scrollbar untuk Dropdown Notifikasi */}
+            <style>{`
+                .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+                .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+                .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+                .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #ef4444; }
+            `}</style>
         </div>
     );
 }
