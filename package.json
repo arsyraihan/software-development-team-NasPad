@@ -22,7 +22,12 @@
         "vite": "^8.0.0"
     },
     "dependencies": {
+        "@emotion/react": "^11.14.0",
+        "@emotion/styled": "^11.14.1",
+        "@mui/material": "^9.1.1",
+        "@mui/x-charts": "^9.5.0",
         "apexcharts": "^5.14.0",
+        "lucide-react": "^1.17.0",
         "react-apexcharts": "^2.1.0",
         "react-is": "^19.2.7",
         "recharts": "^3.8.1"
