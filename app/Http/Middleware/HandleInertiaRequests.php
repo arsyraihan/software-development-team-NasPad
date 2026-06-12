@@ -34,6 +34,16 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
+            // Membagikan flash message (Toast popup)
+            'flash' => [
+                'success' => $request->session()->get('success'),
+                'error' => $request->session()->get('error'),
+            ],
+            // Membagikan riwayat notifikasi terbaru ke ikon lonceng
+            'notifications' => $request->user() 
+                ? \App\Models\AppNotification::where('user_id', $request->user()->id)
+                    ->orderBy('created_at', 'desc')->take(10)->get() 
+                : [],
         ];
     }
 }
