@@ -8,6 +8,8 @@ use App\Repositories\Contracts\ActivityRepositoryInterface;
 use App\Repositories\ActivityRepository;
 use App\Repositories\Contracts\UserRepositoryInterface;
 use App\Repositories\UserRepository;
+use Illuminate\Support\Facades\URL;
+use App\Services\ActivityService;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -39,5 +41,9 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Vite::prefetch(concurrency: 3);
+
+        if (config('app.env') === 'production') {
+            URL::forceScheme('https');
+        }
     }
 }
