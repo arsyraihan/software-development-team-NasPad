@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
-import { Eye, EyeOff } from 'lucide-react'; // Mengambil icon dari Lucide React
+import { Eye, EyeOff } from 'lucide-react';
 
 export default function Login({ status, canResetPassword }) {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -40,7 +40,6 @@ export default function Login({ status, canResetPassword }) {
                 
                 {/* 1. INPUT EMAIL */}
                 <div className="relative p-[2px] rounded-xl overflow-hidden shadow-lg group">
-                    
                     <div className="absolute top-1/2 left-1/2 w-[400%] h-[400%] spin-fast bg-[conic-gradient(from_0deg,transparent_0%,#991b1b_10%,#ff0000_20%,#ffffff_25%,transparent_25%)]" />
                     <div className="absolute top-1/2 left-1/2 w-[400%] h-[400%] spin-fast bg-[conic-gradient(from_180deg,transparent_0%,#991b1b_10%,#ff0000_20%,#ffffff_25%,transparent_25%)]" />
 
@@ -70,7 +69,6 @@ export default function Login({ status, canResetPassword }) {
 
                 {/* 2. INPUT PASSWORD */}
                 <div className="relative p-[2px] rounded-xl overflow-hidden shadow-lg group">
-                    
                     <div className="absolute top-1/2 left-1/2 w-[400%] h-[400%] spin-fast bg-[conic-gradient(from_0deg,transparent_0%,#991b1b_10%,#ff0000_20%,#ffffff_25%,transparent_25%)]" />
                     <div className="absolute top-1/2 left-1/2 w-[400%] h-[400%] spin-fast bg-[conic-gradient(from_180deg,transparent_0%,#991b1b_10%,#ff0000_20%,#ffffff_25%,transparent_25%)]" />
 
@@ -93,17 +91,12 @@ export default function Login({ status, canResetPassword }) {
                                 Password
                             </label>
                             
-                            {/* Tombol Toggle Mata (Lucide React) */}
                             <button
                                 type="button"
                                 onClick={() => setShowPassword(!showPassword)}
                                 className="absolute right-1 bottom-1.5 text-gray-500 hover:text-red-500 transition-colors focus:outline-none"
                             >
-                                {showPassword ? (
-                                    <EyeOff className="w-4 h-4" />
-                                ) : (
-                                    <Eye className="w-4 h-4" />
-                                )}
+                                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                             </button>
                         </div>
                         {errors.password && <p className="text-red-400 text-xs mt-1.5">{errors.password}</p>}
@@ -111,7 +104,7 @@ export default function Login({ status, canResetPassword }) {
                 </div>
 
                 {/* Link Pendukung */}
-                <div className="flex justify-start px-2 mt-1">
+                <div className="flex justify-between items-center px-2 mt-1">
                     {canResetPassword && (
                         <Link
                             href={route('password.request')}
@@ -120,6 +113,13 @@ export default function Login({ status, canResetPassword }) {
                             Forgot Password ?
                         </Link>
                     )}
+                    
+                    <Link
+                        href={route('register')}
+                        className="text-xs font-medium text-gray-400 hover:text-red-400 transition-colors"
+                    >
+                        Create Account
+                    </Link>
                 </div>
 
                 {/* Tombol Login */}
@@ -133,7 +133,6 @@ export default function Login({ status, canResetPassword }) {
                     </button>
                 </div>
             </form>
-            
         </GuestLayout>
     );
 }
