@@ -10,7 +10,6 @@ export default function Login({ status, canResetPassword }) {
         remember: false,
     });
 
-    // State untuk mengontrol visibilitas password
     const [showPassword, setShowPassword] = useState(false);
 
     useEffect(() => {
@@ -103,8 +102,8 @@ export default function Login({ status, canResetPassword }) {
                     </div>
                 </div>
 
-                {/* Link Pendukung */}
-                <div className="flex justify-between items-center px-2 mt-1">
+                {/* Link Pendukung: Hanya Lupa Password (Tombol Register Dihapus) */}
+                <div className="flex justify-start px-2 mt-1">
                     {canResetPassword && (
                         <Link
                             href={route('password.request')}
@@ -113,13 +112,6 @@ export default function Login({ status, canResetPassword }) {
                             Forgot Password ?
                         </Link>
                     )}
-                    
-                    <Link
-                        href={route('register')}
-                        className="text-xs font-medium text-gray-400 hover:text-red-400 transition-colors"
-                    >
-                        Create Account
-                    </Link>
                 </div>
 
                 {/* Tombol Login */}
