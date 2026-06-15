@@ -2,13 +2,15 @@ import ApplicationLogo from '@/Components/ApplicationLogo';
 import Dropdown from '@/Components/Dropdown';
 import NavLink from '@/Components/NavLink';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
-import { Link, usePage, router } from '@inertiajs/react';
+import NotificationDropdown from '@/Components/NotificationDropdown'; 
+import SettingsDropdown from '@/Components/SettingsDropdown'; // <-- Ini Import yang ditambahkan
+import { Link, usePage } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
-import { Clock, Bell, LayoutDashboard, Activity, CalendarDays, Users, User, LogOut, Check, Trash2 } from 'lucide-react';
+import { Clock, LayoutDashboard, Activity, CalendarDays, Users, User, LogOut } from 'lucide-react';
 
 export default function AuthenticatedLayout({ header, children }) {
     const authUser = usePage().props.auth.user;
-    const { flash, notifications } = usePage().props;
+    const { flash } = usePage().props; 
 
     const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
     const [showToast, setShowToast] = useState(false);
@@ -73,80 +75,11 @@ export default function AuthenticatedLayout({ header, children }) {
                                 {currentTime.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }).replace(':', '.')}
                             </div>
                             
-                            {/* NOTIFICATION BELL WIDGET */}
-                            <Dropdown>
-                                <Dropdown.Trigger>
-                                    <button className="relative p-2 text-gray-500 hover:text-red-600 transition-all duration-300 transform hover:-translate-y-1 hover:bg-red-50 rounded-full focus:outline-none">
-                                        <Bell className="w-6 h-6" />
-                                        {/* Titik merah hanya muncul jika ada notifikasi yang BELUM dibaca */}
-                                        {notifications?.filter(n => !n.is_read).length > 0 && (
-                                            <span className="absolute top-1 right-1 flex h-3 w-3">
-                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                                                <span className="relative inline-flex rounded-full h-3 w-3 bg-red-600"></span>
-                                            </span>
-                                        )}
-                                    </button>
-                                </Dropdown.Trigger>
-                                <Dropdown.Content width="w-80">
-                                    <div className="block px-4 py-3 text-xs font-bold uppercase bg-gray-50 border-b border-gray-100 text-gray-700 flex justify-between items-center rounded-t-md">
-                                        <span>Notifikasi</span>
-                                        {notifications?.length > 0 && (
-                                            <button 
-                                                onClick={(e) => {
-                                                    e.preventDefault();
-                                                    router.delete(route('notifications.destroyAll'), { preserveScroll: true, preserveState: true });
-                                                }} 
-                                                className="text-gray-400 hover:text-red-500 transition lowercase font-medium"
-                                            >
-                                                hapus semua
-                                            </button>
-                                        )}
-                                    </div>
-                                    <div className="max-h-64 overflow-y-auto custom-scrollbar bg-white">
-                                        {notifications?.length > 0 ? (
-                                            notifications.map((notif) => (
-                                                <div key={notif.id} className={`block px-4 py-3 text-sm border-b border-gray-50 transition relative group ${notif.is_read ? 'opacity-60' : 'bg-white border-l-4 border-l-orange-500'}`}>
-                                                    <div className="pr-12"> 
-                                                        <span className={`block font-medium ${notif.is_read ? 'text-gray-500' : 'text-gray-800'}`}>{notif.pesan}</span>
-                                                        <span className="text-[10px] text-gray-400 mt-1 block">{new Date(notif.created_at).toLocaleString('id-ID')}</span>
-                                                    </div>
-                                                    
-                                                    {/* Tombol Aksi Minimalis (Tanpa Background) */}
-                                                    <div className="absolute right-3 top-4 flex space-x-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                                                        {!notif.is_read && (
-                                                            <button 
-                                                                onClick={(e) => {
-                                                                    e.preventDefault();
-                                                                    router.patch(route('notifications.read', notif.id), {}, { preserveScroll: true, preserveState: true });
-                                                                }} 
-                                                                className="text-gray-300 hover:text-emerald-500 transition-colors" 
-                                                                title="Tandai Dibaca"
-                                                            >
-                                                                <Check className="w-4 h-4"/>
-                                                            </button>
-                                                        )}
-                                                        <button 
-                                                            onClick={(e) => {
-                                                                e.preventDefault();
-                                                                router.delete(route('notifications.destroy', notif.id), { preserveScroll: true, preserveState: true });
-                                                            }} 
-                                                            className="text-gray-300 hover:text-red-500 transition-colors" 
-                                                            title="Hapus"
-                                                        >
-                                                            <Trash2 className="w-4 h-4"/>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            ))
-                                        ) : (
-                                            <div className="block px-4 py-8 text-sm text-gray-400 text-center flex flex-col items-center">
-                                                <Bell className="w-8 h-8 opacity-20 mb-2" />
-                                                Bersih, tidak ada notifikasi.
-                                            </div>
-                                        )}
-                                    </div>
-                                </Dropdown.Content>
-                            </Dropdown>
+                            {/* ============================================== */}
+                            {/* WIDGET NOTIFIKASI & SETTINGS */}
+                            {/* ============================================== */}
+                            <NotificationDropdown />
+                            <SettingsDropdown />
 
                             {/* USER PROFILE */}
                             <Dropdown>
@@ -211,7 +144,7 @@ export default function AuthenticatedLayout({ header, children }) {
 
             <main className="relative z-0 pb-12">{children}</main>
 
-            {/* Custom Scrollbar untuk Dropdown Notifikasi */}
+            {/* Custom Scrollbar untuk area tertentu */}
             <style>{`
                 .custom-scrollbar::-webkit-scrollbar { width: 4px; }
                 .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
