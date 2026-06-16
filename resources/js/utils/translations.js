@@ -16,8 +16,8 @@ export const translations = {
         settings_title: 'Display Settings',
         settings_language: 'Language',
         settings_theme: 'System Theme',
-        theme_default: 'Default (Red Orange)',
-        theme_bluewhite: 'Blue White',
+        theme_default: 'Apricot',
+        theme_bluewhite: 'Skyline',
         
         // Pengaturan Baru (Preferensi & Info)
         settings_appearance: 'Appearance',
@@ -117,8 +117,8 @@ export const translations = {
         settings_title: 'Pengaturan',
         settings_language: 'Bahasa',
         settings_theme: 'Tema Sistem',
-        theme_default: 'Default (Merah Oranye)',
-        theme_bluewhite: 'Blue White',
+       theme_default: 'Apricot',
+        theme_bluewhite: 'Skyline',
         
         // Pengaturan Baru (Preferensi & Info)
         settings_appearance: 'Tampilan',
