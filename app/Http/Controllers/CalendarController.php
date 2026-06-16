@@ -10,7 +10,27 @@ class CalendarController extends Controller
 {
     public function index()
     {
-        $notes = Note::with('user')->get();
+        $user = auth()->user();
+        $divisi = $user->divisi;
+        
+        $notesQuery = Note::with('user');
+
+        // -------------------------------------------------------------
+        // BUG FIX: KEBOCORAN PRIVASI DATA NOTES
+        // -------------------------------------------------------------
+        if ($user->role === 'atasan') {
+            // Atasan hanya melihat catatan dari anggota divisinya
+            $notesQuery->whereHas('user', function($q) use ($divisi) {
+                if ($divisi) {
+                    $q->where('divisi', $divisi);
+                }
+            });
+        } else {
+            // User reguler hanya melihat catatannya sendiri
+            $notesQuery->where('user_id', $user->id);
+        }
+
+        $notes = $notesQuery->get();
 
         return Inertia::render('Calendar/Index', [
             'notes' => $notes
