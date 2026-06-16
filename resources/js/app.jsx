@@ -4,6 +4,8 @@ import './bootstrap.js';
 import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
+import { AppSettingsProvider } from '@/Context/AppSettings';
+import IntroScreen from '@/Components/IntroScreen'; // <-- IMPORT INTRO SCREEN DI SINI
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -17,7 +19,13 @@ createInertiaApp({
     setup({ el, App, props }) {
         const root = createRoot(el);
 
-        root.render(<App {...props} />);
+        root.render(
+            <AppSettingsProvider>
+                {/* INTRO SCREEN BERJALAN GLOBAL DI SELURUH APLIKASI */}
+                <IntroScreen />
+                <App {...props} />
+            </AppSettingsProvider>
+        );
     },
     progress: {
         color: '#4B5563',

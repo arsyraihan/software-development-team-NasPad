@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Head, useForm } from '@inertiajs/react';
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
-import IntroScreen from '@/Components/IntroScreen';
+import { useAppSettings } from '@/Context/AppSettings';
 
 export default function Login({ status }) {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -10,6 +10,9 @@ export default function Login({ status }) {
     });
 
     const [showPassword, setShowPassword] = useState(false);
+    
+    // Membaca pengaturan tema dan bahasa
+    const { theme, t } = useAppSettings();
 
     useEffect(() => {
         return () => {
@@ -26,10 +29,6 @@ export default function Login({ status }) {
         <>
             <Head title="Log in" />
             
-            {/* Memanggil File Komponen Intro */}
-            <IntroScreen />
-
-            {/* CSS Langsung untuk Animasi Gradasi Teks & FIX BUG MATA BROWSER */}
             <style>{`
                 @keyframes text-gradient {
                     0% { background-position: 0% 50%; }
@@ -40,7 +39,6 @@ export default function Login({ status }) {
                     background-size: 200% auto;
                     animation: text-gradient 4s ease-in-out infinite;
                 }
-                
                 /* MEMATIKAN IKON MATA BAWAAN BROWSER (EDGE/CHROME) */
                 input[type="password"]::-ms-reveal,
                 input[type="password"]::-ms-clear,
@@ -50,12 +48,23 @@ export default function Login({ status }) {
             `}</style>
 
             <div className="min-h-screen w-full flex items-center justify-center bg-[#fcfcfd] relative overflow-hidden p-4">
-                
-                {/* Background Fluid */}
-                <div className="absolute top-[-20%] left-[-15%] w-[65%] h-[70%] bg-gradient-to-br from-[#dce8fa]/80 via-[#eef3fb]/60 to-transparent rounded-full blur-[100px] pointer-events-none" />
-                <div className="absolute bottom-[-20%] right-[-15%] w-[65%] h-[70%] bg-gradient-to-tl from-[#fce2df]/80 via-[#fbedea]/60 to-transparent rounded-full blur-[100px] pointer-events-none" />
-                <div className="absolute top-[30%] right-[10%] w-[30%] h-[30%] bg-[#e3ecfa]/40 rounded-full blur-[100px] pointer-events-none" />
-                <div className="absolute bottom-[30%] left-[10%] w-[30%] h-[30%] bg-[#fce9e6]/40 rounded-full blur-[100px] pointer-events-none" />
+
+                {/* BACKGROUND DINAMIS BERDASARKAN TEMA */}
+                {theme === 'bluewhite' ? (
+                    <>
+                        <div className="absolute top-[-20%] left-[-15%] w-[65%] h-[70%] bg-gradient-to-br from-[#cce0ff]/80 via-[#e6f0ff]/60 to-transparent rounded-full blur-[100px] pointer-events-none" />
+                        <div className="absolute bottom-[-20%] right-[-15%] w-[65%] h-[70%] bg-gradient-to-tl from-[#b3d4ff]/70 via-[#d9e8ff]/60 to-transparent rounded-full blur-[100px] pointer-events-none" />
+                        <div className="absolute top-[30%] right-[10%] w-[30%] h-[30%] bg-[#cce0ff]/40 rounded-full blur-[100px] pointer-events-none" />
+                        <div className="absolute bottom-[30%] left-[10%] w-[30%] h-[30%] bg-[#d9e8ff]/40 rounded-full blur-[100px] pointer-events-none" />
+                    </>
+                ) : (
+                    <>
+                        <div className="absolute top-[-20%] left-[-15%] w-[65%] h-[70%] bg-gradient-to-br from-[#dce8fa]/80 via-[#eef3fb]/60 to-transparent rounded-full blur-[100px] pointer-events-none" />
+                        <div className="absolute bottom-[-20%] right-[-15%] w-[65%] h-[70%] bg-gradient-to-tl from-[#fce2df]/80 via-[#fbedea]/60 to-transparent rounded-full blur-[100px] pointer-events-none" />
+                        <div className="absolute top-[30%] right-[10%] w-[30%] h-[30%] bg-[#e3ecfa]/40 rounded-full blur-[100px] pointer-events-none" />
+                        <div className="absolute bottom-[30%] left-[10%] w-[30%] h-[30%] bg-[#fce9e6]/40 rounded-full blur-[100px] pointer-events-none" />
+                    </>
+                )}
 
                 {/* Kartu Login */}
                 <div className="w-full max-w-md relative z-10">
@@ -69,7 +78,8 @@ export default function Login({ status }) {
                                 className="w-[3.75rem] h-[3.75rem] object-cover rounded-[1.2rem] bg-transparent mix-blend-multiply border-0 shadow-none ring-0 outline-none pointer-events-none select-none"
                             />
                             <h1 className="text-[2.75rem] font-extrabold tracking-tight select-none pointer-events-none">
-                                <span className="animate-text-gradient bg-gradient-to-r from-[#4579b5] via-[#e47356] to-[#7cbce7] bg-clip-text text-transparent">
+                                {/* TEKS GRADIENT: Animasi BERJALAN di KEDUA tema */}
+                                <span className={`animate-text-gradient bg-clip-text text-transparent bg-gradient-to-r ${theme === 'bluewhite' ? 'from-[#3b82f6] via-[#93c5fd] to-[#3b82f6]' : 'from-[#4579b5] via-[#e47356] to-[#7cbce7]'}`}>
                                     onetracker
                                 </span>
                             </h1>
@@ -81,7 +91,7 @@ export default function Login({ status }) {
                             
                             {/* Input Email */}
                             <div>
-                                <div className="relative flex items-center border border-gray-200 rounded-2xl focus-within:border-blue-400 focus-within:ring-4 focus-within:ring-blue-400/10 bg-white/90 transition-all px-4 py-3.5 shadow-sm">
+                                <div className={`relative flex items-center border border-gray-200 rounded-2xl focus-within:ring-4 bg-white/90 transition-all px-4 py-3.5 shadow-sm ${theme === 'bluewhite' ? 'focus-within:border-blue-400 focus-within:ring-blue-400/10' : 'focus-within:border-blue-400 focus-within:ring-blue-400/10'}`}>
                                     <Mail className="text-gray-400 w-5 h-5 mr-3 flex-shrink-0" />
                                     <input
                                         id="email"
@@ -89,7 +99,7 @@ export default function Login({ status }) {
                                         name="email"
                                         value={data.email}
                                         className="w-full p-0 bg-transparent border-0 text-gray-700 text-sm font-medium focus:ring-0 placeholder-gray-400"
-                                        placeholder="Nama Pengguna atau Email"
+                                        placeholder={t('login_placeholder_email')}
                                         onChange={(e) => setData('email', e.target.value)}
                                         required
                                         autoFocus
@@ -100,7 +110,7 @@ export default function Login({ status }) {
 
                             {/* Input Password */}
                             <div>
-                                <div className="relative flex items-center border border-gray-200 rounded-2xl focus-within:border-blue-400 focus-within:ring-4 focus-within:ring-blue-400/10 bg-white/90 transition-all px-4 py-3.5 shadow-sm">
+                                <div className={`relative flex items-center border border-gray-200 rounded-2xl focus-within:ring-4 bg-white/90 transition-all px-4 py-3.5 shadow-sm ${theme === 'bluewhite' ? 'focus-within:border-blue-400 focus-within:ring-blue-400/10' : 'focus-within:border-blue-400 focus-within:ring-blue-400/10'}`}>
                                     <Lock className="text-gray-400 w-5 h-5 mr-3 flex-shrink-0" />
                                     <input
                                         id="password"
@@ -108,7 +118,7 @@ export default function Login({ status }) {
                                         name="password"
                                         value={data.password}
                                         className="w-full p-0 bg-transparent border-0 text-gray-700 text-sm font-medium focus:ring-0 placeholder-gray-400"
-                                        placeholder="Kata Sandi"
+                                        placeholder={t('login_placeholder_password')}
                                         onChange={(e) => setData('password', e.target.value)}
                                         required
                                     />
@@ -128,9 +138,9 @@ export default function Login({ status }) {
                                 <button
                                     type="submit"
                                     disabled={processing}
-                                    className="w-full py-4 bg-gradient-to-r from-[#1750a2] via-[#5c6da4] to-[#ea9070] text-white font-bold text-sm rounded-2xl transition-all shadow-[0_8px_20px_rgba(23,80,162,0.15)] hover:shadow-[0_12px_25px_rgba(23,80,162,0.25)] active:scale-[0.98] disabled:opacity-70"
+                                    className={`w-full py-4 text-white font-bold text-sm rounded-2xl transition-all active:scale-[0.98] disabled:opacity-70 bg-gradient-to-r ${theme === 'bluewhite' ? 'from-blue-600 via-blue-500 to-cyan-500 shadow-[0_8px_20px_rgba(37,99,235,0.15)] hover:shadow-[0_12px_25px_rgba(37,99,235,0.25)]' : 'from-[#1750a2] via-[#5c6da4] to-[#ea9070] shadow-[0_8px_20px_rgba(23,80,162,0.15)] hover:shadow-[0_12px_25px_rgba(23,80,162,0.25)]'}`}
                                 >
-                                    {processing ? 'MEMPROSES...' : 'Masuk Sekarang'}
+                                    {processing ? t('login_button_processing') : t('login_button_submit')}
                                 </button>
                             </div>
 

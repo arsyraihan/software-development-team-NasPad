@@ -6,6 +6,7 @@
 .phpunit.result.cache
 /.codex
 /.cursor/
+/.env
 /.idea
 /.nova
 /.phpunit.cache
