@@ -5,9 +5,9 @@ import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
 import { AppSettingsProvider } from '@/Context/AppSettings';
-import IntroScreen from '@/Components/IntroScreen'; // <-- IMPORT INTRO SCREEN DI SINI
+import IntroScreen from '@/Components/IntroScreen'; 
 
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+const appName = 'onetracker';
 
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
