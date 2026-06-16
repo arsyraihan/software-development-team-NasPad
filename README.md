@@ -27,7 +27,7 @@
 
 <div align="center">
   <br>
-  <a href="https://masukkan-link-website-anda-disini.com">
+  <a href="https://onetracker.up.railway.app">
     <img src="https://img.shields.io/badge/Live_Website-0EA5E9?style=for-the-badge&logo=google-chrome&logoColor=white" alt="Live Website" />
   </a>
   <a href="../../releases">
