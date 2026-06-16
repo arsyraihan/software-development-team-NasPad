@@ -67,7 +67,7 @@ Aplikasi ini menggunakan pendekatan infrastruktur **Monolith Modern (SPA)** yang
 | <kbd>Dashboard</kbd> | **Command Center:** Visualisasi data interaktif menggunakan grafik (Area, Polar) untuk memantau performa dan pencapaian OKR/BSC.              |
 | <kbd>Tracker</kbd>   | **Activity Tracker:** Pencatatan log aktivitas harian (Daily Task, Improvement) dan pelaporan ketidakhadiran (Sakit/Izin) secara _real-time_. |
 | <kbd>Schedule</kbd>  | **Team Calendar:** Kalender interaktif bergaya modern untuk mencatat agenda, jadwal rapat, dan pengingat lintas divisi.                       |
-| <kbd>UI/UX</kbd>     | **Dynamic Theming:** Mendukung kustomisasi tema visual bawaan (_Default Red-Orange_ & _Blue-White_) dengan transisi animasi yang mulus.       |
+| <kbd>UI/UX</kbd>     | **Dynamic Theming:** Mendukung kustomisasi tema visual bawaan (_Apricot_ & _Skyline_) dengan transisi animasi yang mulus.                     |
 | <kbd>Locale</kbd>    | **Multi-Language:** Dukungan _Internationalization_ (ID & EN) yang dapat diganti secara instan di menu pengaturan tanpa perlu _reload_.       |
 | <kbd>System</kbd>    | **Zero-Lag Notif:** Sistem notifikasi berbasis _Local Cache_ yang memangkas beban _query database_ hingga 0%, super cepat dan ringan!         |
 
