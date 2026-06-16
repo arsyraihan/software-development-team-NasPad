@@ -1,57 +1,108 @@
-<p align="center">
-  <a href="https://laravel.com" target="_blank">
-    <img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo">
+<div align="center">
+  <a href="https://github.com/arsyraihan/software-development-team-naspad">
+    <img src="https://readme-typing-svg.herokuapp.com/?font=Righteous&weight=800&size=35&pause=1000&color=F97316&center=true&vCenter=true&width=600&lines=Welcome+to+OneTracker;Empower+Your+Team;Boost+Productivity" alt="Typing SVG" />
   </a>
-</p>
+  
+  <br>
+  
+  <img src="public/b20958bd-6fca-46af-88f1-dd313a547c28.jpeg" alt="OneTracker Logo" width="140" style="border-radius: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); margin-top: 15px; margin-bottom: 20px;">
 
-<p align="center">
-  <a href="https://laravel.com/"><img src="https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white" alt="Laravel"></a>
-  <a href="https://react.dev/"><img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React"></a>
-  <a href="https://inertiajs.com/"><img src="https://img.shields.io/badge/Inertia.js-9553E9?style=for-the-badge&logo=Inertia&logoColor=white" alt="Inertia.js"></a>
-  <a href="https://supabase.com/"><img src="https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white" alt="Supabase"></a>
-  <a href="https://tailwindcss.com/"><img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind CSS"></a>
-</p>
+  <p><b>Platform Pelacak Aktivitas, Kehadiran, dan Produktivitas Tim Terpadu</b></p>
 
-# OneTracker 🚀
+  <p>
+    <img src="https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white" alt="Laravel"/>
+    <img src="https://img.shields.io/badge/React-0F172A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React"/>
+    <img src="https://img.shields.io/badge/Inertia.js-9553E9?style=for-the-badge&logo=inertia&logoColor=white" alt="Inertia"/>
+    <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind"/>
+    <img src="https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=111827" alt="Supabase"/>
+    <img src="https://img.shields.io/badge/Electron-47848F?style=for-the-badge&logo=electron&logoColor=white" alt="Electron"/>
+  </p>
+</div>
 
-**OneTracker** adalah aplikasi sistem manajemen tugas dan aktivitas internal yang dikembangkan untuk memudahkan pemantauan dan pelaporan produktivitas tim. Dibangun dengan memprioritaskan performa dan antarmuka yang modern, aplikasi ini mengusung mode gelap (Dark Mode) yang elegan dengan sentuhan animasi dinamis.
+<br>
+
+> [!TIP]
+> **Kenapa OneTracker?**
+> OneTracker dibangun menggunakan arsitektur **Monolith Modern (SPA)**. Aplikasi ini tidak sekadar mencatat data, melainkan merangkumnya dalam antarmuka kelas _enterprise_ yang estetik. Tersedia untuk Web dan Desktop, menghadirkan pengalaman pengguna (UX) yang sangat mulus tanpa _loading/refresh_ halaman!
+
+<div align="center">
+  <br>
+  <a href="https://masukkan-link-website-anda-disini.com">
+    <img src="https://img.shields.io/badge/Live_Website-0EA5E9?style=for-the-badge&logo=google-chrome&logoColor=white" alt="Live Website" />
+  </a>
+  <a href="../../releases">
+    <img src="https://img.shields.io/badge/Download_.EXE-F43F5E?style=for-the-badge&logo=windows&logoColor=white" alt="Download Desktop" />
+  </a>
+  <br><br>
+</div>
 
 ---
 
-## 🛠️ Teknologi & Arsitektur
+## ![Tentang Aplikasi](https://img.shields.io/badge/Tentang_Aplikasi-3B82F6?style=for-the-badge)
 
-Aplikasi ini dikembangkan menggunakan teknologi modern (_Tech Stack_) dengan struktur arsitektur yang kokoh:
-
-- **Bahasa Pemrograman:** [PHP 8.2+](https://www.php.net/) & [JavaScript (ES6+)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
-- **Backend Framework:** [Laravel 11](https://laravel.com/)
-- **Frontend Library:** [React.js](https://react.dev/)
-- **Bridge / SPA Routing:** [Inertia.js](https://inertiajs.com/) (Menghilangkan kebutuhan pembuatan REST API terpisah)
-- **Styling:** [Tailwind CSS](https://tailwindcss.com/)
-- **Database:** PostgreSQL terkelola oleh [Supabase](https://supabase.com/)
-- **Arsitektur Desain:** \* **MVC (Model-View-Controller)**: Pemisahan logika data, tampilan, dan kontroler.
-    - **Repository Pattern**: Ekstraksi logika _query_ database (terlihat pada `ActivityRepository` & `UserRepository`) untuk membuat _controller_ lebih bersih dan _codebase_ lebih mudah dipelihara.
+**OneTracker** adalah aplikasi manajemen produktivitas kelas _enterprise_ yang dirancang secara khusus untuk membantu tim dan perusahaan dalam melacak tugas harian, memonitor jam kerja efektif, mengelola jadwal secara kolaboratif, serta mencatat log kehadiran. Aplikasi ini tersedia dalam dua ekosistem, yakni platform Web dan aplikasi Desktop (Windows `.exe`), menghadirkan pengalaman pengguna (UX) yang sangat mulus, modern, dan sangat _responsive_.
 
 ---
 
-## ⚙️ Prasyarat (Prerequisites)
+## ![Arsitektur & Teknologi](https://img.shields.io/badge/Arsitektur_&_Teknologi-0EA5E9?style=for-the-badge)
 
-Sebelum melakukan kloning dan instalasi, pastikan komputer Anda telah terinstal perangkat lunak berikut:
+Aplikasi ini menggunakan pendekatan infrastruktur **Monolith Modern (SPA)** yang dipadukan dengan **Repository Pattern** pada sisi _backend_. Kombinasi ini menghasilkan basis kode yang sangat bersih (_Clean Code_), terstruktur, _scalable_, dan mudah untuk di-_maintain_.
 
-1.  **PHP** (Minimal versi 8.2)
-2.  **Composer** (Package manager untuk PHP)
-3.  **Node.js & NPM** (Package manager untuk JavaScript)
-4.  **Git** ---
+| Layer Sistem              | Teknologi / Pattern      | Peran & Fungsi Sistem                                                                                            |
+| :------------------------ | :----------------------- | :--------------------------------------------------------------------------------------------------------------- |
+| <kbd>Design Pattern</kbd> | **Repository & Service** | Memisahkan logika akses data (Repository) dan logika bisnis (Service) agar _Controller_ tetap ramping dan solid. |
+| <kbd>Backend</kbd>        | **Laravel 11**           | Menangani _Routing_, _Controller_, logika sistem inti, dan Autentikasi yang tangguh.                             |
+| <kbd>Frontend</kbd>       | **React.js 18**          | Merender _User Interface_ yang dinamis dan interaktif menggunakan _Functional Components_.                       |
+| <kbd>Bridge</kbd>         | **Inertia.js**           | Bertindak sebagai penghubung data SPA antara _Backend_ dan _Frontend_ tanpa perlu membuat REST API manual.       |
+| <kbd>Database</kbd>       | **Supabase**             | Penyimpanan data relasional berbasis PostgreSQL yang sangat aman dan modern.                                     |
+| <kbd>Styling</kbd>        | **Tailwind CSS**         | Pengaturan gaya visual UI/UX, transisi animasi, dan _Dynamic Theming_.                                           |
+| <kbd>Desktop</kbd>        | **Electron.js**          | Membungkus (_wrapper_) aplikasi web menjadi format eksekusi lokal Desktop (`.exe`).                              |
 
-## 💻 Panduan Instalasi (Local Development)
+---
 
-Ikuti langkah-langkah di bawah ini untuk mengunduh dan menjalankan **OneTracker** di mesin lokal Anda:
+## ![Fitur Unggulan](https://img.shields.io/badge/Fitur_Unggulan-8B5CF6?style=for-the-badge)
+
+| Kategori             | Nama Fitur & Deskripsi                                                                                                                        |
+| :------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------- |
+| <kbd>Dashboard</kbd> | **Command Center:** Visualisasi data interaktif menggunakan grafik (Area, Polar) untuk memantau performa dan pencapaian OKR/BSC.              |
+| <kbd>Tracker</kbd>   | **Activity Tracker:** Pencatatan log aktivitas harian (Daily Task, Improvement) dan pelaporan ketidakhadiran (Sakit/Izin) secara _real-time_. |
+| <kbd>Schedule</kbd>  | **Team Calendar:** Kalender interaktif bergaya modern untuk mencatat agenda, jadwal rapat, dan pengingat lintas divisi.                       |
+| <kbd>UI/UX</kbd>     | **Dynamic Theming:** Mendukung kustomisasi tema visual bawaan (_Default Red-Orange_ & _Blue-White_) dengan transisi animasi yang mulus.       |
+| <kbd>Locale</kbd>    | **Multi-Language:** Dukungan _Internationalization_ (ID & EN) yang dapat diganti secara instan di menu pengaturan tanpa perlu _reload_.       |
+| <kbd>System</kbd>    | **Zero-Lag Notif:** Sistem notifikasi berbasis _Local Cache_ yang memangkas beban _query database_ hingga 0%, super cepat dan ringan!         |
+
+---
+
+## ![Keamanan Sistem](https://img.shields.io/badge/Keamanan_Sistem-EF4444?style=for-the-badge)
+
+Keamanan adalah fondasi utama dari arsitektur OneTracker:
+
+- <kbd>RBAC</kbd> **Role-Based Access:** Pemisahan hak akses ketat antara **Atasan** (Supervisor) dan **Karyawan**. Modul krusial hanya dapat diakses oleh Atasan.
+- <kbd>ENV</kbd> **Environment Safe:** Kredensial `.env` dan API Key diamankan dan dipastikan tidak pernah diekspos ke repositori publik.
+- <kbd>Auth</kbd> **Encrypted Auth:** Seluruh kata sandi pengguna dienkripsi menggunakan algoritma **Bcrypt** tingkat lanjut bawaan sistem.
+- <kbd>Sec</kbd> **XSS/CSRF Shield:** Proteksi otomatis terhadap serangan injeksi _script_ lintas-situs yang ditangani berlapis oleh Middleware dan React DOM.
+
+---
+
+## ![Panduan Instalasi](https://img.shields.io/badge/Panduan_Instalasi-10B981?style=for-the-badge)
+
+> [!IMPORTANT]
+> Sebelum memulai, pastikan perangkat Anda memenuhi spesifikasi minimum berikut sesuai dengan dependensi `composer.json` dan `package.json`:
+>
+> - <kbd>Core</kbd> **PHP** 8.4.12
+> - <kbd>Core</kbd> **Node.js** 24.13.0 & **NPM** 11.6.2
+> - <kbd>Core</kbd> **Composer** 2.9.4
+> - <kbd>Framework</kbd> **Laravel** 13.15.0
+> - <kbd>Library</kbd> **React** 18.3.1
+> - <kbd>Database</kbd> **Supabase** (PostgreSQL) 17.6
+> - <kbd>Tools</kbd> **Git**
 
 ### 1. Clone Repositori
 
 Buka Terminal atau Command Prompt, lalu jalankan perintah berikut untuk mengunduh kode sumber aplikasi:
 
 ```bash
-git clone [https://github.com/arsyraihan/software-development-team-naspad.git](https://github.com/arsyraihan/software-development-team-naspad.git)
+git clone https://github.com/arsyraihan/software-development-team-naspad.git
 cd software-development-team-naspad
 ```
 
@@ -98,8 +149,6 @@ php artisan key:generate
 
 ### 5. Migrasi & Seeding Database
 
-Buat struktur tabel ke dalam database Supabase dan isi dengan data awalan (seeder)
-
 ```bash
 php artisan migrate:fresh --seed
 
@@ -118,20 +167,30 @@ npm run dev
 php artisan serve
 ```
 
----
+Local Host dapat diakses melalui:
 
-### 🔒 Keamanan
-
-Fitur registrasi umum dinonaktifkan pada proyek ini (disabled public registration). Hal ini diimplementasikan secara sengaja agar manajemen penambahan pengguna (user) sepenuhnya dikontrol oleh Administrator (PM/Atasan) untuk melindungi data internal perusahaan/tim
-
----
-
-### 👨‍💻 Dikembangkan Oleh
-
-**NasPad Team - Software Development Project.**
-
-- **Arsy Raihan:** - Project Manager
-- **Dwi Aris Setiawan:** - Backend Developer
-- **Rizky Wiga:** - Frontend (AFK)
+```bash
+http://localhost:8000
+```
 
 ---
+
+## ![Tim Pengembang](https://img.shields.io/badge/Tim_Pengembang-F59E0B?style=for-the-badge)
+
+<div align="center">
+  <br>
+  <img src="https://img.shields.io/badge/Developed_by-Tim_NasPad-0F172A?style=for-the-badge&logo=github&logoColor=white" alt="Tim NasPad" />
+  <p><i>Aplikasi ini dirancang, dibangun, dan dikembangkan dengan dedikasi tinggi oleh:</i></p>
+</div>
+
+|        Peran Sistem        | Profil Pengembang                                                                                                                                 | Area Pengembangan Utama                                  |
+| :------------------------: | :------------------------------------------------------------------------------------------------------------------------------------------------ | :------------------------------------------------------- |
+| <kbd>Project Manager</kbd> | [![Arsy Raihan](https://img.shields.io/badge/Arsy_Raihan-F97316?style=flat-square&logo=github&logoColor=white)](https://github.com/arsyraihan)    | _Project Management, Arsitektur Inti (SPA), React UI/UX_ |
+|   <kbd>Backend Dev</kbd>   | [![Dwi Aris Setiawan](https://img.shields.io/badge/Dwi_Aris_S-3B82F6?style=flat-square&logo=github&logoColor=white)](https://github.com/Ghea2003) | _Backend, Database dan arsitektur_                       |
+|  <kbd>Frontend Dev</kbd>   | [![Rizky Wiga](https://img.shields.io/badge/Rizky_Wiga-10B981?style=flat-square&logo=github&logoColor=white)](https://github.com/rzwig4)          | _Status -- AFK_                                          |
+
+<br>
+
+<div align="center">
+  <img src="https://img.shields.io/badge/©_2026_OneTracker_Team-09090B?style=flat-square" alt="Copyright">
+</div>
