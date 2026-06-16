@@ -24,8 +24,19 @@ class ActivityController extends Controller
         $user = auth()->user();
         
         if ($user->role === 'atasan') {
-            $activities = $this->activityRepository->getAllActivities();
+            // Tarik data dari repository
+            $allActivities = $this->activityRepository->getAllActivities();
+            
+            // -------------------------------------------------------------
+            // BUG FIX: KEBOCORAN PRIVASI LINTAS DIVISI UNTUK ATASAN
+            // Filter koleksi agar atasan hanya melihat data anggota divisinya sendiri
+            // -------------------------------------------------------------
+            $activities = collect($allActivities)->filter(function ($activity) use ($user) {
+                return $activity->user && $activity->user->divisi === $user->divisi;
+            })->values();
+            
         } else {
+            // Logika ini sudah aman, user reguler hanya mendapat datanya sendiri
             $activities = $this->activityRepository->getUserActivities($user->id);
         }
 
