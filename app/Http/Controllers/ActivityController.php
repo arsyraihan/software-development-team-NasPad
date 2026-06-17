@@ -24,10 +24,10 @@ class ActivityController extends Controller
         $user = auth()->user();
         
         if ($user->role === 'atasan') {
-<<<<<<< HEAD
+
             $allActivities = $this->activityRepository->getAllActivities();
             
-=======
+
             // Tarik data dari repository
             $allActivities = $this->activityRepository->getAllActivities();
             
@@ -35,7 +35,7 @@ class ActivityController extends Controller
             // BUG FIX: KEBOCORAN PRIVASI LINTAS DIVISI UNTUK ATASAN
             // Filter koleksi agar atasan hanya melihat data anggota divisinya sendiri
             // -------------------------------------------------------------
->>>>>>> 774c8a58a711b2807b6790c567b935f2b17ece4d
+
             $activities = collect($allActivities)->filter(function ($activity) use ($user) {
                 return $activity->user && $activity->user->divisi === $user->divisi;
             })->values();
@@ -73,14 +73,13 @@ class ActivityController extends Controller
 
         return redirect()->back()->with('success', 'Aktivitas berhasil dicatat.');
     }
-<<<<<<< HEAD
 
     // --- TAMBAHAN CRUD: UPDATE ---
     public function update(Request $request, $id)
     {
         // --- GEMBOK GANDA: Pengecekan 6 Jam ---
         $dataLama = \App\Models\Activity::findOrFail($id);
-        if ($dataLama->created_at->diffInHours(now()) > 6) {
+       if ($dataLama->created_at && $dataLama->created_at->diffInHours(now()) > 6) {
             abort(403, 'Batas waktu edit (6 jam) sudah habis.');
         }
         // --------------------------------------
@@ -122,6 +121,4 @@ class ActivityController extends Controller
         return redirect()->back()->with('success', 'Aktivitas berhasil dihapus.');
     }
 }
-=======
-}
->>>>>>> 774c8a58a711b2807b6790c567b935f2b17ece4d
+

@@ -15,25 +15,14 @@ class CalendarController extends Controller
         
         $notesQuery = Note::with('user');
 
-<<<<<<< HEAD
+        // Logika Filter Privasi
         if ($user->role === 'atasan') {
-=======
-        // -------------------------------------------------------------
-        // BUG FIX: KEBOCORAN PRIVASI DATA NOTES
-        // -------------------------------------------------------------
-        if ($user->role === 'atasan') {
-            // Atasan hanya melihat catatan dari anggota divisinya
->>>>>>> 774c8a58a711b2807b6790c567b935f2b17ece4d
             $notesQuery->whereHas('user', function($q) use ($divisi) {
                 if ($divisi) {
                     $q->where('divisi', $divisi);
                 }
             });
         } else {
-<<<<<<< HEAD
-=======
-            // User reguler hanya melihat catatannya sendiri
->>>>>>> 774c8a58a711b2807b6790c567b935f2b17ece4d
             $notesQuery->where('user_id', $user->id);
         }
 
@@ -56,7 +45,6 @@ class CalendarController extends Controller
 
         return redirect()->back()->with('success', 'Catatan kalender berhasil ditambahkan.');
     }
-<<<<<<< HEAD
 
     public function update(Request $request, $id)
     {
@@ -68,10 +56,11 @@ class CalendarController extends Controller
         $note = Note::findOrFail($id);
         
         // --- GEMBOK GANDA: Batas 6 Jam ---
-        if ($note->created_at->diffInHours(now()) > 6) {
+       if ($note->created_at && $note->created_at->diffInHours(now()) > 6)
             abort(403, 'Batas waktu edit (6 jam) sudah habis.');
         }
 
+        // Proteksi ekstra: Hanya pemilik catatan (atau atasan) yang boleh mengedit
         if ($note->user_id !== auth()->id() && auth()->user()->role !== 'atasan') {
             abort(403, 'Akses ditolak.');
         }
@@ -94,6 +83,3 @@ class CalendarController extends Controller
         return redirect()->back()->with('success', 'Catatan kalender berhasil dihapus.');
     }
 }
-=======
-}
->>>>>>> 774c8a58a711b2807b6790c567b935f2b17ece4d
