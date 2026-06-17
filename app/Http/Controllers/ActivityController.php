@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Services\ActivityService;
 use App\Repositories\Contracts\ActivityRepositoryInterface;
-use App\Models\AppNotification; // Tambahan untuk memanggil model notifikasi
+use App\Models\AppNotification; 
 use Inertia\Inertia;
 
 class ActivityController extends Controller
@@ -24,6 +24,10 @@ class ActivityController extends Controller
         $user = auth()->user();
         
         if ($user->role === 'atasan') {
+<<<<<<< HEAD
+            $allActivities = $this->activityRepository->getAllActivities();
+            
+=======
             // Tarik data dari repository
             $allActivities = $this->activityRepository->getAllActivities();
             
@@ -31,6 +35,7 @@ class ActivityController extends Controller
             // BUG FIX: KEBOCORAN PRIVASI LINTAS DIVISI UNTUK ATASAN
             // Filter koleksi agar atasan hanya melihat data anggota divisinya sendiri
             // -------------------------------------------------------------
+>>>>>>> 774c8a58a711b2807b6790c567b935f2b17ece4d
             $activities = collect($allActivities)->filter(function ($activity) use ($user) {
                 return $activity->user && $activity->user->divisi === $user->divisi;
             })->values();
@@ -58,17 +63,65 @@ class ActivityController extends Controller
             'ibadah' => 'nullable|string'
         ]);
 
-        // Panggil Service untuk mengurus perhitungan dan penyimpanan
         $this->activityService->storeActivity($validated, auth()->id());
 
-        // --- SISTEM PENCATATAN NOTIFIKASI ---
         AppNotification::create([
             'user_id' => auth()->id(),
             'pesan' => 'Berhasil mengirim data Tracker/Laporan baru.',
             'tipe' => 'success'
         ]);
-        // ------------------------------------
 
         return redirect()->back()->with('success', 'Aktivitas berhasil dicatat.');
     }
+<<<<<<< HEAD
+
+    // --- TAMBAHAN CRUD: UPDATE ---
+    public function update(Request $request, $id)
+    {
+        // --- GEMBOK GANDA: Pengecekan 6 Jam ---
+        $dataLama = \App\Models\Activity::findOrFail($id);
+        if ($dataLama->created_at->diffInHours(now()) > 6) {
+            abort(403, 'Batas waktu edit (6 jam) sudah habis.');
+        }
+        // --------------------------------------
+
+        $validated = $request->validate([
+            'tanggal' => 'required|date',
+            'task' => 'required|string|max:255',
+            'waktu_mulai' => 'required',
+            'waktu_akhir' => 'required',
+            'keluaran' => 'required|string',
+            'kategori' => 'required|string',
+            'ibadah' => 'nullable|string'
+        ]);
+
+        // Memanggil service untuk update (Pastikan fungsi updateActivity ada di ActivityService Anda)
+        $this->activityService->updateActivity($id, $validated);
+
+        AppNotification::create([
+            'user_id' => auth()->id(),
+            'pesan' => 'Berhasil mengubah data Aktivitas.',
+            'tipe' => 'info'
+        ]);
+
+        return redirect()->back()->with('success', 'Aktivitas berhasil diperbarui.');
+    }
+
+    // --- TAMBAHAN CRUD: DESTROY ---
+    public function destroy($id)
+    {
+        // Memanggil repository untuk hapus (Pastikan fungsi deleteActivity ada di Repository Anda)
+        $this->activityRepository->deleteActivity($id);
+
+        AppNotification::create([
+            'user_id' => auth()->id(),
+            'pesan' => 'Data Aktivitas berhasil dihapus.',
+            'tipe' => 'error'
+        ]);
+
+        return redirect()->back()->with('success', 'Aktivitas berhasil dihapus.');
+    }
 }
+=======
+}
+>>>>>>> 774c8a58a711b2807b6790c567b935f2b17ece4d

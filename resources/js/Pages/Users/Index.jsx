@@ -1,21 +1,56 @@
-import React from 'react';
+import React, { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm, router } from '@inertiajs/react';
-import { UserPlus, Users as UsersIcon, Shield, Briefcase, Mail, Key, Trash2, KeyRound } from 'lucide-react';
+import { UserPlus, Users as UsersIcon, Shield, Briefcase, Mail, Key, Trash2, KeyRound, Edit3, XCircle } from 'lucide-react'; // <-- TAMBAHAN Edit3 & XCircle
 import { useAppSettings } from '@/Context/AppSettings';
 
 export default function Index({ auth, users }) {
     const { t, theme } = useAppSettings();
 
-    const { data, setData, post, processing, errors, reset } = useForm({
+    // --- TAMBAHAN STATE UNTUK EDIT ---
+    const [isEditing, setIsEditing] = useState(false);
+    const [editId, setEditId] = useState(null);
+
+    // --- TAMBAHAN put DARI useForm ---
+    const { data, setData, post, put, processing, errors, reset } = useForm({
         name: '', email: '', password: '', password_confirmation: '', role: 'karyawan', divisi: 'IT'
     });
 
+    // --- FUNGSI TOMBOL EDIT ---
+    const handleEdit = (user) => {
+        setIsEditing(true);
+        setEditId(user.id);
+        setData({
+            name: user.name,
+            email: user.email,
+            password: '', // Kosongkan password agar tidak tertimpa jika tidak ingin diubah
+            password_confirmation: '',
+            role: user.role,
+            divisi: user.divisi || 'IT',
+        });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    // --- FUNGSI BATAL EDIT ---
+    const cancelEdit = () => {
+        setIsEditing(false);
+        setEditId(null);
+        reset(); // Kembalikan form ke kondisi kosong (tambah user baru)
+    };
+
+    // --- MODIFIKASI FUNGSI SUBMIT (POST & PUT) ---
     const submit = (e) => {
         e.preventDefault();
-        post(route('users.store'), {
-            onSuccess: () => reset(),
-        });
+        
+        if (isEditing) {
+            put(route('users.update', editId), {
+                onSuccess: () => cancelEdit(),
+            });
+        } else {
+            post(route('users.store'), {
+                onSuccess: () => reset(),
+            });
+        }
     };
 
     const deleteUser = (id) => {
@@ -38,11 +73,17 @@ export default function Index({ auth, users }) {
 
             <div className="pt-8 pb-12 max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
                 
-                {/* Form Tambah User */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden transition hover:shadow-md">
-                    <div className="bg-gray-50/80 px-6 py-4 border-b border-gray-100 flex items-center">
-                        <UserPlus className={`w-5 h-5 mr-2 ${theme === 'bluewhite' ? 'text-blue-500' : 'text-orange-500'}`} />
-                        <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wider">{t('user_add_new') || 'Tambah Pengguna Baru'}</h3>
+                {/* Form Tambah/Edit User */}
+                <div className={`bg-white rounded-xl shadow-sm border overflow-hidden transition hover:shadow-md ${isEditing ? 'border-indigo-200' : 'border-gray-100'}`}>
+                    <div className={`px-6 py-4 border-b flex items-center ${isEditing ? 'bg-indigo-50/50 border-indigo-100' : 'bg-gray-50/80 border-gray-100'}`}>
+                        {isEditing ? (
+                            <Edit3 className="w-5 h-5 mr-2 text-indigo-500" />
+                        ) : (
+                            <UserPlus className={`w-5 h-5 mr-2 ${theme === 'bluewhite' ? 'text-blue-500' : 'text-orange-500'}`} />
+                        )}
+                        <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wider">
+                            {isEditing ? 'Edit Pengguna' : (t('user_add_new') || 'Tambah Pengguna Baru')}
+                        </h3>
                     </div>
                     <div className="p-6 sm:p-8">
                         <form onSubmit={submit} className="space-y-6">
@@ -66,14 +107,14 @@ export default function Index({ auth, users }) {
                                 </div>
                                 <div>
                                     <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1"><Key className="inline w-3 h-3 mr-1"/> {t('user_password') || 'Password'}</label>
-                                    <input type="password" placeholder="Min 8 chars" className={`w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white transition-all text-sm ${theme === 'bluewhite' ? 'focus:border-blue-500 focus:ring-blue-200' : 'focus:border-orange-500 focus:ring-orange-200'}`}
-                                        value={data.password} onChange={e => setData('password', e.target.value)} required />
+                                    <input type="password" placeholder={isEditing ? "Kosongkan jika tidak diubah" : "Min 8 chars"} className={`w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white transition-all text-sm ${theme === 'bluewhite' ? 'focus:border-blue-500 focus:ring-blue-200' : 'focus:border-orange-500 focus:ring-orange-200'}`}
+                                        value={data.password} onChange={e => setData('password', e.target.value)} required={!isEditing} />
                                     {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
                                 </div>
                                 <div>
                                     <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1"><KeyRound className="inline w-3 h-3 mr-1"/> {t('user_confirm_pass') || 'Konfirmasi Password'}</label>
-                                    <input type="password" placeholder="..." className={`w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white transition-all text-sm ${theme === 'bluewhite' ? 'focus:border-blue-500 focus:ring-blue-200' : 'focus:border-orange-500 focus:ring-orange-200'}`}
-                                        value={data.password_confirmation} onChange={e => setData('password_confirmation', e.target.value)} required />
+                                    <input type="password" placeholder={isEditing ? "Kosongkan jika tidak diubah" : "..."} className={`w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white transition-all text-sm ${theme === 'bluewhite' ? 'focus:border-blue-500 focus:ring-blue-200' : 'focus:border-orange-500 focus:ring-orange-200'}`}
+                                        value={data.password_confirmation} onChange={e => setData('password_confirmation', e.target.value)} required={!isEditing && data.password !== ''} />
                                 </div>
                                 <div>
                                     <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1"><Shield className="inline w-3 h-3 mr-1"/> {t('user_role') || 'Peran (Role)'}</label>
@@ -85,10 +126,19 @@ export default function Index({ auth, users }) {
                                 </div>
                             </div>
                             
-                            <div className="flex justify-end pt-4 border-t border-gray-100">
+                            <div className="flex justify-end pt-4 border-t border-gray-100 gap-3">
+                                {/* TAMBAHAN TOMBOL BATAL JIKA MODE EDIT */}
+                                {isEditing && (
+                                    <button type="button" onClick={cancelEdit} className="flex items-center px-6 py-2.5 text-gray-600 bg-gray-100 hover:bg-gray-200 text-sm font-bold rounded-xl transition-all duration-300">
+                                        <XCircle className="w-4 h-4 mr-2" /> Batal
+                                    </button>
+                                )}
+
                                 <button type="submit" disabled={processing} 
-                                    className={`flex justify-center items-center px-8 py-2.5 text-white text-sm font-bold rounded-xl transition-all transform hover:-translate-y-0.5 hover:shadow-md active:scale-95 ${theme === 'bluewhite' ? 'bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600' : 'bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600'}`}>
-                                    <UserPlus className="w-4 h-4 mr-2"/> {processing ? (t('user_processing') || 'Memproses...') : (t('user_btn_submit') || 'Daftarkan User')}
+                                    className={`flex justify-center items-center px-8 py-2.5 text-white text-sm font-bold rounded-xl transition-all transform hover:-translate-y-0.5 hover:shadow-md active:scale-95 
+                                    ${isEditing ? 'bg-indigo-600 hover:bg-indigo-700' : (theme === 'bluewhite' ? 'bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600' : 'bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600')}`}>
+                                    {isEditing ? <Edit3 className="w-4 h-4 mr-2"/> : <UserPlus className="w-4 h-4 mr-2"/>} 
+                                    {processing ? (t('user_processing') || 'Memproses...') : (isEditing ? 'Simpan Perubahan' : (t('user_btn_submit') || 'Daftarkan User'))}
                                 </button>
                             </div>
                         </form>
@@ -113,7 +163,7 @@ export default function Index({ auth, users }) {
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-50">
                                 {users.map((u) => (
-                                    <tr key={u.id} className="hover:bg-gray-50/50 transition group">
+                                    <tr key={u.id} className={`hover:bg-gray-50/50 transition group ${editId === u.id ? 'bg-indigo-50/40' : ''}`}>
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <div className="text-sm font-bold text-gray-800">{u.name}</div>
                                             <div className="text-xs text-gray-500 flex items-center mt-0.5"><Mail className="w-3 h-3 mr-1"/>{u.email}</div>
@@ -133,12 +183,20 @@ export default function Index({ auth, users }) {
                                             </span>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            {auth.user.id !== u.id && (
-                                                <button onClick={() => deleteUser(u.id)} 
-                                                    className={`transition-colors p-1.5 rounded-md text-gray-300 ${theme === 'bluewhite' ? 'hover:text-blue-600 hover:bg-blue-50' : 'hover:text-red-500 hover:bg-red-50'}`}>
-                                                    <Trash2 className="w-4 h-4" />
+                                            {/* TOMBOL EDIT & HAPUS */}
+                                            <div className="flex items-center justify-end space-x-2">
+                                                <button onClick={() => handleEdit(u)} 
+                                                    className={`transition-colors p-1.5 rounded-md text-gray-400 ${theme === 'bluewhite' ? 'hover:text-indigo-600 hover:bg-indigo-50' : 'hover:text-orange-500 hover:bg-orange-50'}`} title="Edit Pengguna">
+                                                    <Edit3 className="w-4 h-4" />
                                                 </button>
-                                            )}
+                                                
+                                                {auth.user.id !== u.id && (
+                                                    <button onClick={() => deleteUser(u.id)} 
+                                                        className={`transition-colors p-1.5 rounded-md text-gray-400 ${theme === 'bluewhite' ? 'hover:text-red-500 hover:bg-red-50' : 'hover:text-red-500 hover:bg-red-50'}`} title="Hapus Pengguna">
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </button>
+                                                )}
+                                            </div>
                                         </td>
                                     </tr>
                                 ))}

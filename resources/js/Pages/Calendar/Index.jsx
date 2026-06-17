@@ -1,23 +1,24 @@
 import React, { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm, router } from '@inertiajs/react';
-import { CalendarPlus, Save, Trash2, ChevronLeft, ChevronRight, Info, AlignLeft } from 'lucide-react';
-import { useAppSettings } from '@/Context/AppSettings'; // <-- IMPORT OTAK SETTINGS
+import { CalendarPlus, Save, Trash2, ChevronLeft, ChevronRight, Info, AlignLeft, Edit3, XCircle } from 'lucide-react';
+import { useAppSettings } from '@/Context/AppSettings'; 
 
 export default function Index({ auth, notes }) {
-    const { t, theme } = useAppSettings(); // <-- AMBIL TRANSLATION DAN THEME
+    const { t, theme } = useAppSettings(); 
 
-    // Helper untuk Tanggal Lokal (YYYY-MM-DD)
     const getLocalDate = () => {
         const d = new Date();
         return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
     };
 
-    // State untuk View Kalender dan Tanggal yang di-klik
     const [calDate, setCalDate] = useState(new Date());
     const [selectedDate, setSelectedDate] = useState(getLocalDate());
 
-    const { data, setData, post, processing, reset } = useForm({
+    const [isEditing, setIsEditing] = useState(false);
+    const [editId, setEditId] = useState(null);
+
+    const { data, setData, post, put, processing, reset } = useForm({
         tanggal: selectedDate,
         catatan: '',
     });
@@ -27,7 +28,6 @@ export default function Index({ auth, notes }) {
     const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
     const firstDay = new Date(calYear, calMonth, 1).getDay();
     
-    // Nama Bulan (Diterjemahkan via Kamus)
     const monthNames = [
         t('month_jan'), t('month_feb'), t('month_mar'), t('month_apr'), 
         t('month_may'), t('month_jun'), t('month_jul'), t('month_aug'), 
@@ -37,18 +37,55 @@ export default function Index({ auth, notes }) {
     const nextMonth = () => setCalDate(new Date(calYear, calMonth + 1, 1));
     const prevMonth = () => setCalDate(new Date(calYear, calMonth - 1, 1));
 
-    // Handler klik kotak tanggal
     const handleDayClick = (day) => {
         const dateStr = `${calYear}-${String(calMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
         setSelectedDate(dateStr);
         setData('tanggal', dateStr);
+        if (isEditing) cancelEdit();
+    };
+
+    // --- FUNGSI CEK BATAS WAKTU 6 JAM (DIPERKETAT) ---
+    const isEditable = (createdAt) => {
+        if (!createdAt) return false; 
+        
+        const safeDateString = createdAt.replace(' ', 'T');
+        const noteTime = new Date(safeDateString).getTime();
+        const currentTime = new Date().getTime();
+        
+        const diffInHours = (currentTime - noteTime) / (1000 * 60 * 60);
+        return diffInHours >= 0 && diffInHours <= 6;
+    };
+
+    const handleEdit = (note) => {
+        setIsEditing(true);
+        setEditId(note.id);
+        setData({
+            tanggal: note.tanggal,
+            catatan: note.catatan,
+        });
+    };
+
+    const cancelEdit = () => {
+        setIsEditing(false);
+        setEditId(null);
+        reset('catatan');
+        setData('tanggal', selectedDate);
     };
 
     const submit = (e) => {
         e.preventDefault();
-        post(route('calendar.store'), {
-            onSuccess: () => reset('catatan'), 
-        });
+        
+        if (isEditing) {
+            put(route('calendar.update', editId), {
+                onSuccess: () => {
+                    cancelEdit();
+                }
+            });
+        } else {
+            post(route('calendar.store'), {
+                onSuccess: () => reset('catatan'), 
+            });
+        }
     };
 
     const deleteNote = (id) => {
@@ -75,10 +112,8 @@ export default function Index({ auth, notes }) {
                 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                     
-                    {/* KOLOM KIRI (BESAR): TABEL KALENDER FULL VIEW */}
                     <div className="lg:col-span-8 xl:col-span-9 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col h-auto min-h-[600px]">
                         
-                        {/* Header Kalender */}
                         <div className="px-6 py-5 border-b border-gray-100 flex justify-between items-center bg-white z-10">
                             <div className="flex items-center gap-4">
                                 <button onClick={prevMonth} className={`p-2 bg-gray-50 text-gray-500 rounded-lg transition-colors ${theme === 'bluewhite' ? 'hover:bg-blue-50 hover:text-blue-600' : 'hover:bg-orange-50 hover:text-orange-600'}`}><ChevronLeft className="w-5 h-5"/></button>
@@ -92,10 +127,8 @@ export default function Index({ auth, notes }) {
                             </div>
                         </div>
 
-                        {/* Grid Kalender */}
                         <div className="flex-1 flex flex-col p-4 bg-gray-50/50">
                             
-                            {/* Hari Header */}
                             <div className="grid grid-cols-7 gap-2 mb-2 text-center text-xs font-black uppercase tracking-wider">
                                 <div className={theme === 'bluewhite' ? 'text-blue-500' : 'text-red-500'}>{t('cal_sun')}</div>
                                 <div className="text-gray-500">{t('cal_mon')}</div>
@@ -106,12 +139,9 @@ export default function Index({ auth, notes }) {
                                 <div className="text-gray-500">{t('cal_sat')}</div>
                             </div>
 
-                            {/* Kotak Tanggal */}
                             <div className="flex-1 grid grid-cols-7 gap-2">
-                                {/* Kotak Kosong */}
                                 {Array.from({ length: firstDay }).map((_, i) => <div key={`empty-${i}`} className="bg-transparent rounded-xl aspect-square"></div>)}
                                 
-                                {/* Kotak Hari Asli */}
                                 {Array.from({ length: daysInMonth }).map((_, i) => {
                                     const day = i + 1;
                                     const dateStr = `${calYear}-${String(calMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
@@ -131,7 +161,6 @@ export default function Index({ auth, notes }) {
                                                 }
                                             `}
                                         >
-                                            {/* Nomor Tanggal */}
                                             <div className={`text-right text-sm font-black mb-1
                                                 ${isToday 
                                                     ? (theme === 'bluewhite' ? 'text-white bg-blue-500 rounded-md inline-block ml-auto px-2 py-0.5 shadow-sm' : 'text-white bg-red-500 rounded-md inline-block ml-auto px-2 py-0.5 shadow-sm') 
@@ -143,7 +172,6 @@ export default function Index({ auth, notes }) {
                                                 {day}
                                             </div>
 
-                                            {/* Render Catatan Kecil di dalam Kalender */}
                                             <div className="flex-1 overflow-y-auto custom-scrollbar space-y-1.5 pr-1">
                                                 {dayNotes.map(n => (
                                                     <div key={n.id} className={`text-[10px] leading-tight px-1.5 py-1 rounded border shadow-sm font-medium line-clamp-2 ${theme === 'bluewhite' ? 'bg-gradient-to-r from-blue-50 to-cyan-50 text-blue-800 border-blue-100' : 'bg-gradient-to-r from-red-50 to-orange-50 text-red-800 border-orange-100'}`} title={`${n.user?.name}: ${n.catatan}`}>
@@ -158,14 +186,14 @@ export default function Index({ auth, notes }) {
                         </div>
                     </div>
 
-                    {/* KOLOM KANAN (KECIL): SIDEBAR FORM & LIST */}
                     <div className="lg:col-span-4 xl:col-span-3 space-y-6">
                         
-                        {/* WIDGET 1: FORM TAMBAH CATATAN KECIL */}
                         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                            <div className={`px-5 py-3 flex items-center text-white bg-gradient-to-r ${theme === 'bluewhite' ? 'from-blue-600 to-cyan-500' : 'from-red-600 to-orange-500'}`}>
-                                <CalendarPlus className="w-4 h-4 mr-2" />
-                                <h3 className="text-sm font-bold uppercase tracking-wider">{t('cal_add_note')}</h3>
+                            <div className={`px-5 py-3 flex items-center text-white bg-gradient-to-r ${isEditing ? 'from-indigo-600 to-purple-500' : (theme === 'bluewhite' ? 'from-blue-600 to-cyan-500' : 'from-red-600 to-orange-500')}`}>
+                                {isEditing ? <Edit3 className="w-4 h-4 mr-2" /> : <CalendarPlus className="w-4 h-4 mr-2" />}
+                                <h3 className="text-sm font-bold uppercase tracking-wider">
+                                    {isEditing ? 'Edit Catatan' : t('cal_add_note')}
+                                </h3>
                             </div>
                             <div className="p-5">
                                 <form onSubmit={submit} className="flex flex-col gap-4">
@@ -179,15 +207,22 @@ export default function Index({ auth, notes }) {
                                         <textarea rows="3" placeholder={t('cal_desc_placeholder')} className={`w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white transition-all text-sm ${theme === 'bluewhite' ? 'focus:border-blue-500 focus:ring-blue-200' : 'focus:border-orange-500 focus:ring-orange-200'}`}
                                             value={data.catatan} onChange={e => setData('catatan', e.target.value)} required />
                                     </div>
-                                    <button type="submit" disabled={processing} 
-                                        className="w-full flex justify-center items-center px-4 py-2.5 mt-1 text-white text-sm font-bold rounded-xl bg-gray-800 hover:bg-gray-900 transition-all transform hover:-translate-y-0.5 hover:shadow-md active:scale-95">
-                                        <Save className="w-4 h-4 mr-2"/> {processing ? t('cal_saving') : t('cal_save_btn')}
-                                    </button>
+                                    
+                                    <div className="flex gap-2 mt-1">
+                                        {isEditing && (
+                                            <button type="button" onClick={cancelEdit} className="w-1/3 flex justify-center items-center px-3 py-2.5 text-gray-600 text-xs font-bold rounded-xl bg-gray-100 hover:bg-gray-200 transition-all">
+                                                <XCircle className="w-4 h-4 mr-1"/> Batal
+                                            </button>
+                                        )}
+                                        <button type="submit" disabled={processing} 
+                                            className={`${isEditing ? 'w-2/3 bg-indigo-600 hover:bg-indigo-700' : 'w-full bg-gray-800 hover:bg-gray-900'} flex justify-center items-center px-4 py-2.5 text-white text-sm font-bold rounded-xl transition-all transform hover:-translate-y-0.5 hover:shadow-md active:scale-95`}>
+                                            <Save className="w-4 h-4 mr-2"/> {processing ? t('cal_saving') : (isEditing ? 'Simpan' : t('cal_save_btn'))}
+                                        </button>
+                                    </div>
                                 </form>
                             </div>
                         </div>
 
-                        {/* WIDGET 2: DAFTAR CATATAN PADA TANGGAL TERPILIH */}
                         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col max-h-[380px]">
                             <div className="bg-gray-50/80 px-5 py-3 border-b border-gray-100">
                                 <h3 className="text-xs font-bold text-gray-600 uppercase tracking-wider flex items-center">
@@ -199,16 +234,28 @@ export default function Index({ auth, notes }) {
                                 {notesOnSelectedDate.length > 0 ? (
                                     <div className="divide-y divide-gray-50">
                                         {notesOnSelectedDate.map((note) => (
-                                            <div key={note.id} className={`p-4 transition group flex justify-between items-start gap-2 ${theme === 'bluewhite' ? 'hover:bg-blue-50/30' : 'hover:bg-orange-50/30'}`}>
+                                            <div key={note.id} className={`p-4 transition group flex justify-between items-start gap-2 ${editId === note.id ? 'bg-indigo-50/40' : (theme === 'bluewhite' ? 'hover:bg-blue-50/30' : 'hover:bg-orange-50/30')}`}>
                                                 <div>
                                                     <span className={`text-xs font-bold block mb-0.5 ${theme === 'bluewhite' ? 'text-blue-500' : 'text-red-500'}`}>{note.user?.name}</span>
                                                     <p className="text-sm text-gray-700 leading-snug">{note.catatan}</p>
                                                 </div>
+                                                
                                                 {auth.user.role === 'atasan' || auth.user.id === note.user_id ? (
-                                                    <button onClick={() => deleteNote(note.id)} 
-                                                        className={`transition-colors opacity-0 group-hover:opacity-100 p-1.5 rounded-md shrink-0 text-gray-300 ${theme === 'bluewhite' ? 'hover:text-blue-600 hover:bg-blue-50' : 'hover:text-red-500 hover:bg-red-50'}`}>
-                                                        <Trash2 className="w-4 h-4" />
-                                                    </button>
+                                                    <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        
+                                                        {/* TOMBOL EDIT HANYA MUNCUL JIKA < 6 JAM */}
+                                                        {isEditable(note.created_at) && (
+                                                            <button onClick={() => handleEdit(note)} 
+                                                                className={`p-1.5 rounded-md text-gray-400 ${theme === 'bluewhite' ? 'hover:text-blue-600 hover:bg-blue-50' : 'hover:text-orange-500 hover:bg-orange-50'}`} title="Edit Catatan">
+                                                                <Edit3 className="w-4 h-4" />
+                                                            </button>
+                                                        )}
+
+                                                        <button onClick={() => deleteNote(note.id)} 
+                                                            className="p-1.5 rounded-md text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors" title="Hapus Catatan">
+                                                            <Trash2 className="w-4 h-4" />
+                                                        </button>
+                                                    </div>
                                                 ) : null}
                                             </div>
                                         ))}

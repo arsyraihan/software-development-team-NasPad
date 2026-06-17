@@ -2,7 +2,7 @@
 
 namespace App\Repositories;
 
-use App\Models\Activity; // <--- BARIS INI SANGAT PENTING
+use App\Models\Activity; 
 use App\Repositories\Contracts\ActivityRepositoryInterface;
 
 class ActivityRepository implements ActivityRepositoryInterface 
@@ -20,5 +20,19 @@ class ActivityRepository implements ActivityRepositoryInterface
     public function createActivity(array $data) 
     {
         return Activity::create($data);
+    }
+
+    // --- TAMBAHAN LOGIKA DATABASE CRUD ---
+    public function updateActivity($id, array $data)
+    {
+        $activity = Activity::findOrFail($id);
+        $activity->update($data);
+        return $activity;
+    }
+
+    public function deleteActivity($id)
+    {
+        $activity = Activity::findOrFail($id);
+        return $activity->delete();
     }
 }
