@@ -30,17 +30,28 @@ class DashboardController extends Controller
         $activities = $activitiesForChart->get();
 
         // LOG TERBARU (Tidak dibatasi hari ini, ambil 15 terakhir)
-        $logTerbaru = Activity::with('user')
+        $logTerbaruQuery = Activity::with('user')
             ->whereHas('user', function($q) use ($divisi) {
                 if ($divisi) $q->where('divisi', $divisi);
             })
             ->orderBy('created_at', 'desc')
-            ->take(15)
-            ->get();
+            ->take(15);
+            
+        // Filter: Jika bukan atasan, hanya tampilkan miliknya sendiri
+        if (!$isAtasan) {
+            $logTerbaruQuery->where('user_id', $user->id);
+        }
+        $logTerbaru = $logTerbaruQuery->get();
 
-        $notesHariIni = Note::with('user')->whereHas('user', function($q) use ($divisi) {
+        $notesHariIniQuery = Note::with('user')->whereHas('user', function($q) use ($divisi) {
             if ($divisi) $q->where('divisi', $divisi);
-        })->whereDate('tanggal', Carbon::today())->get();
+        })->whereDate('tanggal', Carbon::today());
+        
+        // Filter: Jika bukan atasan, hanya tampilkan miliknya sendiri
+        if (!$isAtasan) {
+            $notesHariIniQuery->where('user_id', $user->id);
+        }
+        $notesHariIni = $notesHariIniQuery->get();
 
         // Chart 1: Trend Durasi Harian (Area Chart)
         $areaLabels = [];

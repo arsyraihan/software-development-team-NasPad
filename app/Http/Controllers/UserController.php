@@ -25,7 +25,6 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
-        // Tambahkan validasi confirmed pada password
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'role' => 'required|in:atasan,karyawan',
@@ -38,5 +37,39 @@ class UserController extends Controller
         $this->userRepository->createUser($validated);
 
         return redirect()->back()->with('success', 'User berhasil ditambahkan.');
+    }
+
+    // --- TAMBAHAN CRUD: UPDATE ---
+    public function update(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'role' => 'required|in:atasan,karyawan',
+            'divisi' => 'required|string|max:255',
+            // Email harus unik, tapi abaikan jika itu adalah email milik user ini sendiri
+            'email' => 'required|email|unique:users,email,' . $id, 
+            'password' => 'nullable|string|min:8|confirmed', 
+        ]);
+
+        // Jika form password diisi, maka di-hash. Jika kosong, buang dari array agar password lama tidak tertimpa
+        if (!empty($validated['password'])) {
+            $validated['password'] = Hash::make($validated['password']);
+        } else {
+            unset($validated['password']);
+        }
+
+        // Pastikan fungsi updateUser ada di UserRepository Anda
+        $this->userRepository->updateUser($id, $validated);
+
+        return redirect()->back()->with('success', 'Data Karyawan berhasil diperbarui.');
+    }
+
+    // --- TAMBAHAN CRUD: DESTROY ---
+    public function destroy($id)
+    {
+        // Pastikan fungsi deleteUser ada di UserRepository Anda
+        $this->userRepository->deleteUser($id);
+
+        return redirect()->back()->with('success', 'Karyawan berhasil dihapus.');
     }
 }

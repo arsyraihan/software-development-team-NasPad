@@ -3,12 +3,13 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
 import Chart from 'react-apexcharts'; 
 import { Target, CheckCircle, TrendingUp, Users, CalendarClock, ListTodo, AlertCircle } from 'lucide-react';
-import { useAppSettings } from '@/Context/AppSettings'; // <-- IMPORT OTAK SETTINGS
+import { useAppSettings } from '@/Context/AppSettings'; 
 
+// Komponen menerima Data dari laravel (Controller)
 export default function Dashboard({ auth, userRole, userDivisi, totalUsers, notesHariIni, logTerbaru, chartData }) {
     const isAtasan = userRole === 'atasan';
     const fontFamily = 'inherit';
-    const { t, theme } = useAppSettings(); // <-- AMBIL TRANSLATION DAN THEME
+    const { t, theme } = useAppSettings(); // Ambil settings Translation dan Theme
 
     // Chart configurations...
     const areaOptions = {
@@ -140,7 +141,7 @@ export default function Dashboard({ auth, userRole, userDivisi, totalUsers, note
                             <CalendarClock className={`w-5 h-5 mr-2 ${theme === 'bluewhite' ? 'text-blue-500' : 'text-orange-500'}`}/> {t('dash_sched')}
                         </h3>
                         <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-3">
-                            {notesHariIni.length > 0 ? (
+                            {notesHariIni.length > 0 ? ( //Menampilkan daftar catatan
                                 notesHariIni.map((note) => (
                                     <div key={note.id} className={`p-3 border rounded-lg transition ${theme === 'bluewhite' ? 'bg-blue-50/50 border-blue-100 hover:border-blue-200' : 'bg-orange-50/50 border-orange-100 hover:border-orange-200'}`}>
                                         <span className={`text-xs font-bold block mb-0.5 ${theme === 'bluewhite' ? 'text-blue-600' : 'text-orange-600'}`}>{note.user?.name}</span>
@@ -163,7 +164,7 @@ export default function Dashboard({ auth, userRole, userDivisi, totalUsers, note
                     </div>
                     
                     <div className="p-0">
-                        {logTerbaru.length > 0 ? (
+                        {logTerbaru.length > 0 ? ( // Menampilkan histori Aktivitas Terbaru
                             <div className="max-h-64 overflow-y-auto custom-scrollbar divide-y divide-gray-100">
                                 {logTerbaru.map((log) => {
                                     const isHalangan = log.kategori === 'Sakit' || log.kategori === 'Izin';
