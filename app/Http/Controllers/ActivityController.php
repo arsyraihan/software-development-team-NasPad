@@ -24,13 +24,24 @@ class ActivityController extends Controller
         $user = auth()->user();
         
         if ($user->role === 'atasan') {
+<<<<<<< HEAD
             $allActivities = $this->activityRepository->getAllActivities();
             
+=======
+            // Tarik data dari repository
+            $allActivities = $this->activityRepository->getAllActivities();
+            
+            // -------------------------------------------------------------
+            // BUG FIX: KEBOCORAN PRIVASI LINTAS DIVISI UNTUK ATASAN
+            // Filter koleksi agar atasan hanya melihat data anggota divisinya sendiri
+            // -------------------------------------------------------------
+>>>>>>> 774c8a58a711b2807b6790c567b935f2b17ece4d
             $activities = collect($allActivities)->filter(function ($activity) use ($user) {
                 return $activity->user && $activity->user->divisi === $user->divisi;
             })->values();
             
         } else {
+            // Logika ini sudah aman, user reguler hanya mendapat datanya sendiri
             $activities = $this->activityRepository->getUserActivities($user->id);
         }
 
@@ -62,6 +73,7 @@ class ActivityController extends Controller
 
         return redirect()->back()->with('success', 'Aktivitas berhasil dicatat.');
     }
+<<<<<<< HEAD
 
     // --- TAMBAHAN CRUD: UPDATE ---
     public function update(Request $request, $id)
@@ -110,3 +122,6 @@ class ActivityController extends Controller
         return redirect()->back()->with('success', 'Aktivitas berhasil dihapus.');
     }
 }
+=======
+}
+>>>>>>> 774c8a58a711b2807b6790c567b935f2b17ece4d
